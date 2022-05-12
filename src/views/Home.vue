@@ -133,6 +133,7 @@ export default {
   },
   created(){
   //  api.Search('周深').then(res=>{console.log(res.data);});
+  this.username = this.name
   },
   components:{
     player,
