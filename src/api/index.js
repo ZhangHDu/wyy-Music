@@ -41,7 +41,10 @@ const api = {
     getMusicUrl(id){
         return axios.get(base.host+'/song/url?id='+id)
     },
-
+    // 私人FM
+    getFM(){
+        return axios.get(base.host+'/personal_fm')
+    },
 
 
 

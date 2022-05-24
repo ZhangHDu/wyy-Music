@@ -6,11 +6,17 @@
     <div class="main"> 
       <div class="left">
         <aside>
+          <!-- 用户头像以及名称 -->
           <div class="user" @click="showLogin">
+            <!-- 未登录时 -->
             <img src="../assets/images/用户名.png" alt="" v-if='!cookie'>
+            <!-- 登录后用户头像 -->
             <img :src="this.avatarUrl" alt="" v-if="cookie">
-           
+            <!-- 用户昵称 -->
             <div class="name">{{username}}</div>
+            <div class="more" v-if="cookie">
+              <img src="../assets/images/右三角形.png" alt="">
+            </div>
           </div>
           <div class="all">
             <router-link to="/Discover-music">
@@ -68,6 +74,8 @@
     </div>
     <!-- 登陆 -->
     <login v-model="isShowLogin" v-if="isShowLogin"/>
+    <!-- 个人信息 -->
+    <userCard v-if="isShowUser" v-model="isShowUser"/>
     <!-- 底部播放器组件 -->
     <player />
   </div>
@@ -79,6 +87,7 @@
 import player from '../components/player'
 import top from '../components/top'
 import login from '../components/login'
+import userCard from '../components/userCard'
 import {mapState} from 'vuex'
 export default {
   name: 'Home',
@@ -91,7 +100,8 @@ export default {
         isInFriend:false,
         isInFM:false
       },
-      isShowLogin:false,
+      isShowLogin:false, // 是否显示登录页面
+      isShowUser:false, // 是否显示用户信息
       username:'未登录'
     }
   },
@@ -126,6 +136,7 @@ export default {
          this.isShowLogin = true
       }else{
         this.isShowLogin = false
+        this.isShowUser = true
         console.log('个人中心');
       }
      
@@ -138,7 +149,8 @@ export default {
   components:{
     player,
     top,
-    login
+    login,
+    userCard
   },
   computed:{
     ...mapState(['name','cookie','avatarUrl'])
@@ -165,10 +177,26 @@ export default {
             display: flex;
             align-items: center;
             font-size: 14px;
+            justify-content: space-around;
             img{
               width: 40px;
               border-radius: 50%;
               margin: 10px;
+            }
+            .name{
+              width: 100px;
+              overflow: hidden;
+              white-space: nowrap; //不允许换行
+              text-overflow: ellipsis;
+            }
+            .more{
+              height: 60px;
+              display: flex;
+              align-items: center;
+              img{
+                width: 10px;
+                height: 10px;
+              }
             }
           }
           .all{

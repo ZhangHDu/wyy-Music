@@ -1,6 +1,6 @@
 <template>
   <div class="playList">
-      持久化缓存个人信息  
+      歌单
   </div>
 </template>
 

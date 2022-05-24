@@ -101,10 +101,12 @@ export default {
     },
     methods:{
         // 获取轮播图
-        getBanner(){
-            api.getBanners().then(res=>{
-                this.banners = res.data.banners
-            })
+        async getBanner(){
+            // api.getBanners().then(res=>{
+            //     this.banners = res.data.banners
+            // })
+            const res = await api.getBanners()
+            this.banners = res.data.banners
         },
         // 获取首页数据
         getDiscover(){
@@ -184,6 +186,7 @@ export default {
             display: flex;
             align-items: center;
             margin-bottom: 20px;
+            width: 80px;
         }
         img{
             width: 15px;
@@ -243,6 +246,7 @@ export default {
             display: flex;
             align-items: center;
             margin-bottom: 20px;
+            width: 80px;
         }
         img{
             width: 15px;
@@ -290,6 +294,7 @@ export default {
             display: flex;
             align-items: center;
             margin-bottom: 20px;
+            width: 80px;
         }
         img{
             width: 15px;
@@ -357,14 +362,15 @@ export default {
     }
     // 最新音乐
     .newMusic{
-        margin: 0 20px 50px 10px;
+        margin: 0 20px 50px 20px;
         a{
             display: flex;
             align-items: center;
             margin-bottom: 20px;
+            width:80px;
         }
         p{
-            margin-left: 10px;
+            // margin-left: 10px;
         }
         img{
             width: 15px;

@@ -9,6 +9,7 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home,
+    redirect:"/Discover-music", //默认进入个性推荐页面
     children : [
       {
         path:"/Discover-music",
