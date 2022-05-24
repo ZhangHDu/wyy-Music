@@ -20,6 +20,11 @@ const store = new vuex.Store({
          },
         getCookie(state,cookie){
             return state.cookie = cookie
+        },
+        getUser(state,name,url,cookie){
+            return state.name = name,
+                    state.url = url,
+                    state.cookie = cookie
         }
     },
     plugins: [

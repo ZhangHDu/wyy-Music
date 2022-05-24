@@ -7,14 +7,14 @@
       <div class="left">
         <aside>
           <!-- 用户头像以及名称 -->
-          <div class="user" @click="showLogin">
+          <div class="user" @click.stop="showLogin">
             <!-- 未登录时 -->
             <img src="../assets/images/用户名.png" alt="" v-if='!cookie'>
             <!-- 登录后用户头像 -->
             <img :src="this.avatarUrl" alt="" v-if="cookie">
             <!-- 用户昵称 -->
             <div class="name">{{username}}</div>
-            <div class="more" v-if="cookie">
+            <div class="more">
               <img src="../assets/images/右三角形.png" alt="">
             </div>
           </div>

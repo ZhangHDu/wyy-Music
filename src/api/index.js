@@ -45,7 +45,10 @@ const api = {
     getFM(){
         return axios.get(base.host+'/personal_fm')
     },
-
+    // 退出登录
+    Logout(){
+        return axios.get(base.host+'/logout')
+    },
 
 
 

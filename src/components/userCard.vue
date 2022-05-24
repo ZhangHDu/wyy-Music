@@ -26,29 +26,61 @@
       </header>
       <div class="vip">
           <div class="vipCenter">
-              <img src="../assets/images/3.1 会员.png" alt="">
-              <p>会员中心</p>
+              <div class="left">
+                    <img src="../assets/images/3.1 会员.png" alt="">
+                     <p>会员中心</p>
+              </div>
+              <div class="right">
+                  <p>未订购</p>
+                  <img src="../assets/images/下一页2.png" alt="">
+              </div>
+             
           </div>
           <div class="level">
-              <img src="../assets/images/勋章.png" alt="">
-              <p>等级</p>
+              <div class="left">
+                    <img src="../assets/images/勋章.png" alt="">
+                    <p>等级</p>
+              </div>
+              <div class="right">
+                   <p>Lv.7</p>
+                  <img src="../assets/images/下一页2.png" alt="">
+              </div>
+              
           </div>
           <div class="shop">
-              <img src="../assets/images/购物车.png" alt="">
-              <p>商城</p>
+              <div class="left">
+                    <img src="../assets/images/购物车.png" alt="">
+                    <p>商城</p>
+              </div>
+              <div class="right">
+                  <img src="../assets/images/下一页2.png" alt="">
+              </div>
+              
           </div>
       </div>
       <div class="set">
           <div class="person">
-              <img src="../assets/images/设置 (1).png" alt="">
-              <p>个人信息设置</p>
+              <div class="left">
+                    <img src="../assets/images/设置 (1).png" alt="">
+                    <p>个人信息设置</p>
+              </div>
+              <div class="right">
+                  <img src="../assets/images/下一页2.png" alt="">
+              </div>
+              
           </div>
           <div class="phone">
-              <img src="../assets/images/手机.png" alt="">
-              <p>绑定社交账号</p>
+              <div class="left">
+                    <img src="../assets/images/手机.png" alt="">
+                    <p>绑定社交账号</p>
+              </div>
+              <div class="right">
+                  <img src="../assets/images/下一页2.png" alt="">
+              </div>
+              
           </div>
       </div>
-      <footer>
+      <footer @click="logout">
           <img src="../assets/images/关机.png" alt="">
           <p>退出登录</p>
       </footer>
@@ -56,20 +88,41 @@
 </template>
 
 <script>
+import {mapMutations} from 'vuex'
+import api from '../api'
 export default {
     props:['value'],
     methods:{
+        ...mapMutations(['getUser']),//获取修改vue的方法
+        async logout(){
+            const res = await api.Logout()
+            if(res.data.code === 200){
+                console.log('退出登录成功！');
+                // 清除vuex中的用户信息
+                this.getUser('未登录','','')
+            }
+        },
+      
     },
     mounted(){
-       
-    }
+        // 关闭当前组件的操作
+        document.addEventListener('click', (e) => {
+            if ( e.target.className !== 'userCard') {
+                this.$emit("input", false)
+            }
+        })
+    },
+    beforeDestroy() {
+        // 原生绑定的事件监听需解绑
+        window.removeEventListener('click', () => {}, true)
+}
 }
 </script>
 
 <style scoped lang="less">
 .userCard{
     // width: 310px;
-    // height: 350px;
+    // height: 1350px;
     background-color: #fff;
     position: fixed;
     top: 55px;
@@ -142,6 +195,19 @@ export default {
            display: flex;
            padding: 5px 0;
            width: 100%;
+           justify-content: space-between;
+           div{
+               display: flex;
+               align-items: center;
+           }
+           .right{
+               font-size: 12px;
+               color: #e5e5e5;
+               img{
+                   padding: 0 5px;
+                  
+               }
+           }
        }
        .vipCenter:hover{
             background-color: rgb(238, 238, 238);
@@ -158,6 +224,15 @@ export default {
             display: flex;
             padding: 5px 0;
             width: 100%;
+            justify-content: space-between;
+            div{
+                display: flex;
+            }
+            .right{
+                img{
+                    padding: 0 5px;
+                }
+            }
         }
         .person:hover{
             background-color: rgb(238, 238, 238);
