@@ -11,7 +11,15 @@ const api = {
     },
     // 推荐歌单
     getDis(){
-        return axios.get(base.host+'/personalized?limit=12')
+        return axios.get(base.host+'/personalized?limit=6')
+    },
+    // 歌单详情
+    getDetails(id){
+        return axios.get(base.host+'/playlist/detail?id='+id)
+    },
+    // 歌单所有歌曲
+    getDetailsSong(id){
+        return axios.get(base.host+'/playlist/track/all?id='+id)
     },
     // 独家放送
     getPersonalized(){
@@ -49,8 +57,10 @@ const api = {
     Logout(){
         return axios.get(base.host+'/logout')
     },
-
-
+    // 用户详情
+    getUser(id){
+        return axios.get(base.host+'/user/detail?uid='+id)
+    },
 
     // 搜索
     Search(name){

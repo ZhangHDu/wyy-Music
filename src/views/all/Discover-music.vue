@@ -15,7 +15,7 @@
                 <img src="../../assets/images/more.png" alt="">
           </router-link>
           <div class="playList">
-              <div class="DisBox" v-for="item in discover" :key="item.index">
+              <div class="DisBox" v-for="item in discover" :key="item.index" @click="toDetails(item.id)">
                   <div class="icon">
                         <img src="../../assets/images/play.png" alt="">
                     </div>
@@ -92,11 +92,11 @@ import api from '../../api/index.js'
 export default {
     data(){
         return{
-            banners:[{},{},{}],
-            discover:[],
-            personalized:[],
-            DisMV:[],
-            newMusic:[]
+            banners:[{},{},{}], //轮播图
+            discover:[], // 推荐歌单
+            personalized:[], //独家放送
+            DisMV:[], // 推荐mv
+            newMusic:[] //最新音乐
         }
     },
     methods:{
@@ -106,7 +106,7 @@ export default {
             //     this.banners = res.data.banners
             // })
             const res = await api.getBanners()
-            this.banners = res.data.banners
+             this.banners = res.data.banners
         },
         // 获取首页数据
         getDiscover(){
@@ -138,8 +138,12 @@ export default {
                 this.newMusic = res.data.result
                 console.log(this.newMusic[0].song.artists[0].name);
             })
+        },
+        // 点击歌单前往歌单详情
+        toDetails(id){
+            console.log(id);
+            this.$router.push({ path: '/details', query: { id: id } })
         }
-
     },
     created(){
         // 获取轮播图
@@ -196,7 +200,7 @@ export default {
             width: 100%;
             overflow: hidden;
             display: flex;
-            flex-wrap: wrap;
+            // flex-wrap: wrap;
             justify-content: space-between;
             font-size: 14px;
             margin-bottom: 20px;
@@ -204,8 +208,9 @@ export default {
                 width: 170px;
                 position: relative;
                 margin-bottom: 50px;
+                margin-right: 25px;
                 img{
-                    width: 100%;
+                    width: 170px;
                     height: 170px;
                     border-radius: 10px;
                 }
@@ -215,6 +220,9 @@ export default {
                     display:-webkit-box; // 将对象作为弹性伸缩盒子模型显示
                     -webkit-line-clamp:2; //2行文本隐藏
                     -webkit-box-orient:vertical; //定义排列方式
+                }
+                a{
+                    display: block;
                 }
                 .icon{
                     width: 170px;

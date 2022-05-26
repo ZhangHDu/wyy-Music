@@ -7,10 +7,10 @@
             <div class="green"></div>
           </div>
           <div class="top-right">
-            <div class="pre">
+            <div class="pre" @click="preRouter">
               <img src="../assets/images/上一页.png" alt="">
             </div>
-            <div class="next">
+            <div class="next" @click="nextRouter">
               <img src="../assets/images/下一页.png" alt="">
             </div>
           </div>
@@ -23,8 +23,9 @@
             <router-link to="/playList">
                 <div class="Playlist">歌单</div>
             </router-link>
-            
-            <div class="station">主播电台</div>
+            <router-link to="/station">
+              <div class="station">主播电台</div>
+            </router-link>
             <div class="rank">排行榜</div>
             <div class="singer">歌手</div>
             <div class="news">最新音乐</div>
@@ -54,6 +55,14 @@
 <script>
 export default {
     props:['all'],
+    methods:{
+      preRouter(){
+        this.$router.go(-1)
+      },
+      nextRouter(){
+        this.$router.go(1)
+      }
+    },
     created(){
        
     },

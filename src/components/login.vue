@@ -1,10 +1,14 @@
 <template>
   <div class="login">
      <div class="top">
+         <!-- 关闭当前组件 -->
          <div class="left" @click="closeLogin">
              <img src="../assets/images/close.png" alt="">
          </div>
-         <div class="right" v-show="isOther" @click="toQR">前往扫码登录</div>
+         <!-- 切换扫码页面 -->
+         <div class="right" v-show="isOther" >
+             <img @click="toQR" src="../assets/images/二维码.png" alt="">
+         </div>
      </div>
      <main v-show="!isOther">
          <div class="QR">
@@ -14,16 +18,29 @@
                 <div class="loadingQR"></div>
             </div>
             <!-- 二维码 -->
-            <img :src="QRcode" alt="">
+            <img :src="QRcode" alt="" v-if="!this.user.avatarUrl">
+            <!-- 扫码成功显示头像以及昵称 -->
+            <div class="loading" v-if="this.user.avatarUrl">
+                <div class="loadingQR">
+                    <img :src="this.user.avatarUrl" alt="" style="width:100%;">
+                </div>
+            </div>
+            <p v-show="this.user.avatarUrl">{{this.user.name}}</p>
             <!-- 超时显示重新加载 -->
             <div class="QRout" v-if="!QRtype">
-                <div class='getQR' @click="getQRKey">重新获取二维码</div>
+                <p>二维码已过期</p>
+                <div class='getQR' @click="getQRKey">点击刷新</div>
             </div>
-            <p>使用<span style="color:#0081CF">网页云音乐APP</span>扫码登录</p>
+            <!-- 扫码后隐藏 -->
+            <p v-show="!this.user.avatarUrl">使用<span style="color:#0081CF" >网页云音乐APP</span>扫码登录</p>
         </div>
-        <div class="toOthers" @click="toOther">
-            <p>选择其他登录模式></p>
+        <!-- 扫码后隐藏 -->
+        <div class="toOthers" @click="toOther" v-show="!this.user.avatarUrl">
+            <p class="other">选择其他登录模式></p>
          </div>
+     </main>
+     <main v-show="isOther">
+         123
      </main>
      <div class="other" v-show="isOther">
          <div class="img" ></div>
@@ -78,6 +95,7 @@ export default {
         async getQRKey(){
             this.isShow = true
             this.QRcode = '' //先清空二维码再请求
+            
             let nowtime= Date.now()
             api.getQRKey(nowtime).then(res=>{
                 let key = res.data.data.unikey
@@ -112,10 +130,13 @@ export default {
                 if(res.data.code == 800){
                     // 超时修改扫码状态
                     this.QRtype = false
+                    this.user.name = null
+                    this.user.avatarUrl = null
                     clearInterval(check)
                 }else if(res.data.code == 802){
-                    // this.name = res.data.nickname
-                    // this.avatarUrl = res.data.avatarUrl
+                    this.user.name = res.data.nickname
+                    this.user.avatarUrl = res.data.avatarUrl
+                    // 缓存头像以及昵称
                     this.getName(res.data.nickname)
                     this.getAvatarUrl(res.data.avatarUrl)
                     // this.user.cookie = res.data.cookie
@@ -147,7 +168,7 @@ export default {
     created(){
         // 获取二维码的key
         this.getQRKey()
-    }
+    },
 }
 </script>
 
@@ -171,6 +192,14 @@ export default {
                 margin: 10px;
             }
         }
+        .right{
+            
+            img{
+                border-top-right-radius: 15px;
+                width: 60px;
+                background: rgb(235, 235, 235);
+            }
+        }
     }
    main{
        margin-top: 50px;
@@ -188,19 +217,23 @@ export default {
         .QRout{
             width: 140px;
             height: 140px;
-            background: rgba(0, 0, 0, 0.409);
+            background: rgba(0, 0, 0, 0.631);
             position: absolute;
             top: 155px;
             left: 105px;
             display: flex;
-            justify-content: center;
+            justify-content: space-around;
             align-items: center;
-           
+            flex-direction: column;
             color: #fff;
+            p{
+                font-size: 16px;
+                margin-top: 30px;
+            }
             .getQR{  
                 font-size: 14px;
                 border-radius: 15px;
-                background: red;
+                background: rgb(228, 78, 78);
                 padding: 5px 10px;
 
             }
