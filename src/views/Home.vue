@@ -13,7 +13,7 @@
             <!-- 登录后用户头像 -->
             <img :src="this.avatarUrl" alt="" v-if="cookie">
             <!-- 用户昵称 -->
-            <div class="name">{{username="未登录"}}</div>
+            <div class="name">{{username}}</div>
             <div class="more">
               <img src="../assets/images/右三角形.png" alt="">
             </div>
@@ -144,7 +144,7 @@ export default {
   },
   created(){
   //  api.Search('周深').then(res=>{console.log(res.data);});
-  this.username = this.name
+    this.username = this.name
   },
   components:{
     player,

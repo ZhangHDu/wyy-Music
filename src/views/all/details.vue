@@ -1,5 +1,5 @@
 <template>
-  <div class="Details" v-if="isShow">
+  <div class="Details">
       <!-- 歌单详情 -->
       <div class="msg">
           <!-- 歌单图片 -->
@@ -35,11 +35,11 @@
                   </div>
                   <div class="collection">
                       <img src="../../assets/images/添加文件.png" alt="">
-                      <p>收藏</p>
+                      <p>收藏({{subscribedCount}})</p>
                   </div>
                   <div class="share">
                       <img src="../../assets/images/分享.png" alt="">
-                      <p>分享</p>
+                      <p>分享({{shareCount}})</p>
                   </div>
                   <div class="dowload">
                       <img src="../../assets/images/下载.png" alt="">
@@ -74,13 +74,13 @@
                 <el-tab-pane label="歌曲列表" name="first">
                     <el-table
                         :data="songs"
-                        lazy="true"
+                        lazy
                         stripe
                         style="width: 100%">
                             <!-- 序号 -->
                             <el-table-column
                             type='index'
-                            width="40"> 
+                            width="70"> 
                             </el-table-column>
                             <!-- 添加我喜欢 -->
                             <el-table-column
@@ -106,7 +106,7 @@
                             <!-- 专辑名 -->
                             <el-table-column
                             prop="al.name"
-                            show-overflow-tooltip="true"
+                            show-overflow-tooltip
                             width="280"
                             label="专辑">
                             </el-table-column>
@@ -119,7 +119,32 @@
                     </el-table>
                 </el-tab-pane>
                 <!-- 评论 -->
-                <el-tab-pane label="评论" name="second">评论</el-tab-pane>
+                <el-tab-pane :label="'评论('+commentCount+')'" name="second">
+                    <div class="inputArea">输入框</div>
+                    <div class="comments">
+                        <div class="title">精彩评论</div>
+                        <div class="commentList">
+                            <!-- 评论 -->
+                            <div class="comment">
+                                <!-- 左侧头像 -->
+                                <div class="left">
+                                    
+                                </div>
+                                <!-- 右侧评论 -->
+                                <div class="right">
+                                    <div class="rightTop">
+                                        <div class="name">情感文字君:</div>
+                                        <div class="content">愿你们只听歌曲，不知歌词</div>
+                                    </div>
+                                    <div class="rightBottom">
+                                        <div class="time">2018年11月12日 08:32</div>
+                                        <div class="btn"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </el-tab-pane>
                 <!-- 收藏 -->
                 <el-tab-pane label="收藏者" name="third">收藏者</el-tab-pane>
             </el-tabs>
@@ -135,8 +160,7 @@ export default {
         return{
             activeName: 'first',
             details:{},
-            isShow:false,
-            coverImgUrl:this.$route.query.url, // 歌单封面
+            coverImgUrl:null, // 歌单封面
             name:null, // 歌单名
             createTime:null, // 创建时间戳
             time:null, // 创建时间
@@ -149,20 +173,19 @@ export default {
             playCount:0, // 播放量
             userName:null, // 歌单创建者
             songs:[], // 歌单列表
+            subscribedCount:0, // 收藏数量
+            shareCount:0, // 分享数量
+            comments:[], // 评论
+            getpage:false // 是否获取新页面
         }
     },
     methods:{
         // 获取歌单详情
         async getDetails(id){
             const res = await api.getDetails(id)
-            const allSong = await api.getDetailsSong(id)
-            this.songs = allSong.data.songs
-            this.songs.forEach(item => {
-                item.dt = this.getTime(item.dt,2)
-            });
-            this.isShow = true
-            this.details = res.data
-            const {coverImgUrl,name,createTime,commentCount,creator,tags,description,trackCount,playCount,userId} = res.data.playlist
+            // this.details = res
+            // console.log(res);
+            const {coverImgUrl,name,createTime,commentCount,creator,tags,description,trackCount,playCount,userId,subscribedCount,shareCount} = res.data.playlist
             // 获取歌单封面
             this.coverImgUrl = coverImgUrl
             // 获取歌单名
@@ -182,8 +205,28 @@ export default {
             this.trackCount = trackCount
             //  获取播放量
             this.playCount = playCount
+            // 获取收藏数
+            this.subscribedCount = subscribedCount
+            // 获取分享数
+            this.shareCount = shareCount
             // 获取创建者id
             this.getName(userId)
+            // 获取音乐
+            this.getSongs(this.$route.query.id)
+        },
+        // 获取所有歌曲
+        async getSongs(id){
+            const allSong = await api.getDetailsSong(id)
+            this.songs = allSong.data.songs
+            this.songs.forEach(item => {
+                item.dt = this.getTime(item.dt,2)
+            });
+        },
+        // 获取歌单评论
+        async getComment(id){
+            const res = await api.getDetailsComment(id)
+            console.log(res.data.comments);
+            this.comments = res.data.comments
         },
         // 转换时间
         getTime(id,a){
@@ -205,23 +248,38 @@ export default {
             const res = await api.getUser(id)
             this.userName = res.data.profile.nickname
         },
-        handleClick(tab, event) {
-            console.log(tab, event);
+        // tabs切换事件
+        async handleClick(tab) {
+            console.log(tab.index);
+            if(tab.index == 1){
+                 // 获取歌单评论
+                this.getComment(this.$route.query.id)
+            }
         }
     },
     created(){
         // 获取歌单详情
-        this.getDetails(this.$route.query.id)
+        this.getDetails(this.$route.query.id)         
+       
     },
     watch:{
        $route(){
-        //    当路由发送变化的时候
-           this.isShow = false // 页面卸载
+            //    当路由发送变化的时候
            // 判断id有无值，有值才发请求获取歌单详情
+        //    console.log();
            if(this.$route.query.id){
-               this.getDetails(this.$route.query.id)
+                // 重新加载
+                this.getpage = true  
+           }else if(!this.$route.query.id){
+            //    退出路由，不加载歌单页
+              this.getpage = false
            }
            
+       },
+       getpage(){
+           if(this.getpage){
+                this.getDetails(this.$route.query.id)       
+           }
        },
        createTime(){
             this.time = this.getTime(this.createTime,1)
@@ -234,6 +292,7 @@ export default {
 .Details{
     height: 90vh;
     overflow-y: scroll;
+    padding-bottom: 50px;
     .msg{
         margin: 20px 30px;
         display: flex;
@@ -382,8 +441,32 @@ export default {
     }
     .list{
         margin: 20px 30px;
-        .el-tabs__item.is-active {
-            color: red;
+        // 修改tabs组件样式
+        ::v-deep .el-tabs__item.is-active {
+            color: rgb(243, 21, 21);
+        }
+        ::v-deep .el-tabs__item:hover{
+            color: rgb(243, 21, 21);
+        }
+        ::v-deep .el-tabs__active-bar {
+            background-color: rgb(243, 21, 21);
+        }
+        .comments{
+            .commentList{
+                .comment{
+                    .left{
+
+                    }
+                    .right{
+                        .rightTop{
+                            display: flex;
+                        }
+                        .rightBottom{
+
+                        }
+                    }
+                }
+            }
         }
     }
 }

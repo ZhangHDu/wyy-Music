@@ -13,6 +13,7 @@ const api = {
     getDis(){
         return axios.get(base.host+'/personalized?limit=6')
     },
+
     // 歌单详情
     getDetails(id){
         return axios.get(base.host+'/playlist/detail?id='+id)
@@ -21,6 +22,13 @@ const api = {
     getDetailsSong(id){
         return axios.get(base.host+'/playlist/track/all?id='+id)
     },
+    // 歌单评论
+    getDetailsComment(id){
+        return axios.get(base.host+'/comment/playlist?id='+id)
+    },
+
+
+
     // 独家放送
     getPersonalized(){
         return axios.get(base.host+'/personalized/privatecontent/list?limit=4')

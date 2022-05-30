@@ -141,7 +141,7 @@ export default {
         },
         // 点击歌单前往歌单详情
         toDetails(id){
-            console.log(id);
+            // console.log(id);
             this.$router.push({ path: '/details', query: { id: id } })
         }
     },

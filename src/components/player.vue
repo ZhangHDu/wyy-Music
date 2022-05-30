@@ -46,7 +46,7 @@ export default {
     data(){
         return{
             is_play:false,
-            url:'http://m7.music.126.net/20220523055335/b41ecc663e12079f1fb0fea4482859c3/ymusic/0fd6/4f65/43ed/a8772889f38dfcb91c04da915b301617.mp3'
+            url:''
         }
     },
     methods:{

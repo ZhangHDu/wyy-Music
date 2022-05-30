@@ -1,6 +1,6 @@
 <template>
   <div class="playList">
-      歌单
+      午休。。。。。。。。
   </div>
 </template>
 
