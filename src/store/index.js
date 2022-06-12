@@ -6,7 +6,8 @@ const store = new vuex.Store({
     state:{
             name:"",//用户名
             avatarUrl:"",//头像
-            cookie:""
+            cookie:"",
+            playList:[] //播放歌单
        
     },
     mutations:{
@@ -25,6 +26,10 @@ const store = new vuex.Store({
             return state.name = name,
                     state.url = url,
                     state.cookie = cookie
+        },
+        changePlayList(state,obj){
+          // 如果歌曲id已经存在，则放置最后，即当前播放音乐(暂时不做)
+            return state.playList.push(obj)
         }
     },
     plugins: [

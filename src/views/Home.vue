@@ -77,7 +77,7 @@
     <!-- 个人信息 -->
     <userCard v-if="isShowUser" v-model="isShowUser"/>
     <!-- 底部播放器组件 -->
-    <player />
+    <player/>
   </div>
 </template>
 
@@ -102,7 +102,8 @@ export default {
       },
       isShowLogin:false, // 是否显示登录页面
       isShowUser:false, // 是否显示用户信息
-      username:'未登录'
+      username:'未登录',
+      
     }
   },
   methods:{

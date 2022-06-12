@@ -47,13 +47,18 @@
                 <img src="../../assets/images/more.png" alt="">
             </router-link>
             <div class="newMusicList">
-                <ul >
-                    <li v-for="item in newMusic" :key="item.index">
+                <ul>
+                    <li v-for="item in newMusic" :key="item.index" @dblclick="getSongMsg(item)">
                         <div class="left">
+                            <div class="icon">
+                                <img src="../../assets/images/play.png" alt="">
+                                <!-- <img src="../../assets/images/播放.png" alt=""> -->
+                            </div>
                             <img :src="item.picUrl" alt="">
+                            <div class="num">{{item.index}}</div>
                             <div class="song">
                                 <div class="name">{{item.name}}</div>
-                                <!-- <div class="art">{{item.song.artisits[0].name}}</div> -->
+                                <div class="art">{{item.artName}}</div>
                             </div>
                         </div>
                         <div class="right"></div>
@@ -84,11 +89,14 @@
         </div>
       <!-- 主播电台 -->
       <!-- LOOK直播 -->
+      <isplay v-show="false"/>
   </div>
 </template>
 
 <script>
 import api from '../../api/index.js'
+import isplay from '../../components/isplay.vue'
+import {mapMutations} from 'vuex'
 export default {
     data(){
         return{
@@ -99,12 +107,13 @@ export default {
             newMusic:[] //最新音乐
         }
     },
+    components:{
+        isplay
+    },
     methods:{
+        ...mapMutations(['changePlayList']),
         // 获取轮播图
         async getBanner(){
-            // api.getBanners().then(res=>{
-            //     this.banners = res.data.banners
-            // })
             const res = await api.getBanners()
              this.banners = res.data.banners
         },
@@ -136,14 +145,35 @@ export default {
         getNewMusic(){
             api.getNewMusic().then(res=>{
                 this.newMusic = res.data.result
-                console.log(this.newMusic[0].song.artists[0].name);
+                // 处理歌曲前面的数字
+                this.newMusic.forEach((item,index) => {
+                    item.index = index+1
+                    if(item.index<10){
+                        item.index = '0'+item.index
+                        item.artName = item.song.artists[0].name
+                        item.duration = item.song.duration
+                    }
+                });
+                console.log(this.newMusic);
             })
         },
         // 点击歌单前往歌单详情
         toDetails(id){
             // console.log(id);
             this.$router.push({ path: '/details', query: { id: id } })
+        },
+        // 双击歌曲播放
+        getSongMsg(a){
+            console.log(a);
+            this.changePlayList({
+                id:a.id,
+                name:a.name,
+                artName:a.artName,
+                duration:a.duration,
+                img:a.picUrl
+            })
         }
+        
     },
     created(){
         // 获取轮播图
@@ -156,7 +186,8 @@ export default {
         this.getDisMV()
         // 获取最新音乐
         this.getNewMusic()
-    }
+    },
+    
 }
 </script>
 
@@ -387,31 +418,66 @@ export default {
         .newMusicList{
             width:100%;
             ul{
+                width:100%;
                 li:hover{
                     background: #cfcfcf59;
                     border-radius:10px;
                 }
                 li{
-                    width: 98%;
+                    width: 46%;
                     font-size: 14px;
                     padding: 0 10px;
-                    
+                    margin: 0 10px;
+                    float: left;
+                    display: block;
                     .left{
                         border-bottom: 1px solid rgb(224, 224, 224);
                         display: flex;
                         align-items: center;
                         padding: 10px 0;
+                        position: relative;
+                        .icon{
+                            position: absolute;
+                            width: 60px;
+                            height: 60px;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            img{
+                                width: 35px;
+                                height: 35px;
+
+                            }
+                        }
                         img{
                             width: 60px;
                             height: 60px;
                             border-radius: 8px;
                         }
+                        .num{
+                            margin: 0 10px;
+                            color: #bdbdbd;
+                        }
                         .song{
-                            margin-left: 30px;
+                            // margin-left: 30px;
+                            .name{
+                                font-size: 16px;
+                                margin-bottom: 5px;
+                            }
+                            .art{
+                                font-size: 12px;
+                                color: #6b6b6b;
+                            }
                         }
                     }
                 }
                 
+            }
+            ul::after{
+                content: '';
+                height: 0;
+                display: block;
+                clear: both;
             }
         }
     }

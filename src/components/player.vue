@@ -3,9 +3,9 @@
       <div class="top"></div>
       <div class="bottom">
          <div class="left">
-        <img src="../assets/images/1.jpeg" alt="">
+        <img :src=playData.img alt="">
         <div class="msg">
-          <div class="name">情非得已</div>
+          <div class="name">{{playData.name}} - {{playData.artname}}</div>
           <div class="time">00:00/4:27</div>
         </div>
       </div>
@@ -36,29 +36,85 @@
         </div>
       </div>
     </div>
-     <audio :src="url" ref="audio" @play="is_play=true" @pause="is_play=false"></audio>
+     <audio :src="url" ref="audio" @play="is_play=true" @pause="is_play=false" preload:auto></audio>
     </div>
     
 </template>
 
 <script>
+import api from '../api/index.js'
+import {mapState} from 'vuex'
 export default {
     data(){
         return{
-            is_play:false,
+            is_play:false, // 是否播放
+            playData:{
+              name:'',
+              artname:'',
+              time:'',
+              img:''
+            },
             url:''
         }
     },
     methods:{
+        // 是否播放
         isPlay(){
             this.is_play = !this.is_play
             if(this.is_play ==true){
-                this.$refs.audio.play()
+                setTimeout(()=>{
+                  this.$refs.audio.play() // 播放
+                  console.log('开始播放');
+                },500)
+                
+               
             }else{
-                this.$refs.audio.pause()
+                this.$refs.audio.pause() // 暂停
+                console.log('暂停');
             }
-    }
+        },
+        // 获取音乐url
+        async getUrl(id){
+            this.url = null
+            const res = await api.getMusicUrl(id)
+            // console.log(res.data.data);
+            this.url = res.data.data[0].url
+        },
+        // 从vuex获取数据
+        getData(){
+              if(this.playList.length != 0){
+                const id = this.playList[this.playList.length-1].id
+                this.playData.name = this.playList[this.playList.length-1].name
+                this.playData.artname = this.playList[this.playList.length-1].artName
+                this.playData.time = this.playList[this.playList.length-1].duration
+                this.playData.img = this.playList[this.playList.length-1].img
+                this.getUrl(id)
+              }else{
+                console.log('当前没有歌曲缓存');
+                return 
+              }
+              
+        }
     },
+    created(){
+              // 默认优先加载缓存中的最后一首歌 
+              this.getData()
+    },
+    mounted(){
+      console.log(this.playList);
+    },
+    computed:{
+      ...mapState(['playList'])
+    },
+    watch:{
+      playList(){
+        console.log('歌单更新',this.playList[this.playList.length-1].name);
+        // 暂停播放，切歌后再播放
+        this.$refs.audio.pause() // 暂停
+        this.getData()
+        this.$refs.audio.play() // 播放
+      }
+    }
 }
 </script>
 
