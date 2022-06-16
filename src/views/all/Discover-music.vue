@@ -89,7 +89,7 @@
         </div>
       <!-- 主播电台 -->
       <!-- LOOK直播 -->
-      <isplay v-show="false"/>
+      <isplay />
   </div>
 </template>
 
