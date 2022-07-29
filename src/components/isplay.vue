@@ -34,7 +34,7 @@ export default {
     z-index: 9999;
     background-color: #fff;
     border-radius: 15px;
-   
+    box-shadow: 5px 5px 5px #0000002d;
     header{
         display: flex;
         .close{

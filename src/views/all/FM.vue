@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import api from '../../api/index.js'
+// import api from '../../api/index.js'
 export default {
   data(){
     return{
@@ -24,10 +24,10 @@ export default {
     }
   },
   created(){
-    api.getFM().then(res=>{
-      console.log(res);
-      // this.songMsg = res.data.data[0]
-    })
+    // api.getFM().then(res=>{
+    //   console.log(res);
+    //   // this.songMsg = res.data.data[0]
+    // })
   }
 }
 </script>

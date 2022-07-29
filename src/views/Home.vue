@@ -77,7 +77,8 @@
     <!-- 个人信息 -->
     <userCard v-if="isShowUser" v-model="isShowUser"/>
     <!-- 底部播放器组件 -->
-    <player/>
+    <player />
+
   </div>
 </template>
 
@@ -103,6 +104,7 @@ export default {
       isShowLogin:false, // 是否显示登录页面
       isShowUser:false, // 是否显示用户信息
       username:'未登录',
+     
       
     }
   },
@@ -164,14 +166,19 @@ export default {
 <style scoped lang="less">
 .home{
   // width: 100%;
-  // position: relative;
-  min-width: 1000px;
+  border-radius: 10px;
+  position: relative;
+  margin: 10px auto;
+  width: 1000px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.298);
   .main{
     display: flex;
     width: 100%;
       .left{
-        height: 90vh;
-        width: 216px;
+        height: 610px;
+        width: 196px;
         background: #eaeaea;
         aside{
           .user{
@@ -201,7 +208,7 @@ export default {
             }
           }
           .all{
-            width: 216px;
+            width: 196px;
             font-size: 14px;
             color: #8a8a8a;
             .active{

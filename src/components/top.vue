@@ -81,12 +81,12 @@ export default {
 
     .top{
           height: 50px;
-          width: 216px;
+          width: 196px;
           background: #f24d37;
           display: flex;
           justify-content: space-between;
           .top-left{
-            width: 216px;
+            width: 196px;
             display: flex;
             margin-top: 10px;
             margin-left: 10px;

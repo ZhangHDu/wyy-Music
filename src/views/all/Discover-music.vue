@@ -47,23 +47,37 @@
                 <img src="../../assets/images/more.png" alt="">
             </router-link>
             <div class="newMusicList">
-                <ul>
-                    <li v-for="item in newMusic" :key="item.index" @dblclick="getSongMsg(item)">
+                    <div class="musicCard" v-for="item in newMusic" :key="item.index" @dblclick="getSongMsg(item)">
                         <div class="left">
                             <div class="icon">
                                 <img src="../../assets/images/play.png" alt="">
                                 <!-- <img src="../../assets/images/播放.png" alt=""> -->
                             </div>
                             <img :src="item.picUrl" alt="">
-                            <div class="num">{{item.index}}</div>
+                            <div class="num">
+                                {{item.index}}
+                            </div>
                             <div class="song">
-                                <div class="name">{{item.name}}</div>
-                                <div class="art">{{item.artName}}</div>
+                                <div class="name">
+                                    {{item.name}}
+                                    <p v-show="item.song.album.alias[0]">{{"("+item.song.album.alias[0]+")"}}</p>
+                                </div>
+                                <div class="art" >
+                                    <div class="sq" v-show="item.song.sqMusic">
+                                        SQ
+                                    </div>
+                                    <div v-for="arts in item.song.artists" :key="arts.index">
+                                        {{arts.name}}&nbsp;&nbsp;
+                                    </div>
+                                   
+                                </div>
+                            </div>
+                            <div class="video" v-show="item.song.mvid">
+                               MV
                             </div>
                         </div>
                         <div class="right"></div>
-                    </li>
-                </ul>
+                    </div>
             </div>
       </div>
       <!-- 推荐MV -->
@@ -89,14 +103,16 @@
         </div>
       <!-- 主播电台 -->
       <!-- LOOK直播 -->
-      <isplay />
+      <isplay v-if="false"/>
   </div>
 </template>
 
 <script>
-import api from '../../api/index.js'
+import home from '../../http/api/home.js'
 import isplay from '../../components/isplay.vue'
-import {mapMutations} from 'vuex'
+import music from '../../http/api/music'
+import {mapMutations,mapState} from 'vuex'
+
 export default {
     data(){
         return{
@@ -111,67 +127,89 @@ export default {
         isplay
     },
     methods:{
-        ...mapMutations(['changePlayList']),
+        ...mapMutations(['changePlayList','changeNowPlay']),
         // 获取轮播图
         async getBanner(){
-            const res = await api.getBanners()
-             this.banners = res.data.banners
+            const res = await home.getBanners()
+            this.banners = res.banners
         },
         // 获取首页数据
-        getDiscover(){
-            api.getHome().then(res=>{
-                this.discover = res.data.data.blocks[1].creatives
-            })
+        async getDiscover(){
+            const res = await home.getHome()
+            this.discover = res.data.blocks[1].creatives
+
         },
         // 获取推荐歌单
-        getDis(){
-            api.getDis().then(res=>{
-                this.discover = res.data.result
-            })
+        async getDis(){
+            const res = await home.getDis()
+            this.discover = res.result
         },
         // 独家放送
-        getPersonalized(){
-            api.getPersonalized().then(res=>{
-                this.personalized = res.data.result
-            })
+        async getPersonalized(){
+            const res = await home.getPersonalized()
+            this.personalized = res.result
         },
         // 推荐MV
-        getDisMV(){
-            api.getDisMV().then(res=>{
-                this.DisMV = res.data.result
-            })
+        async getDisMV(){
+            const res = await home.getDisMV()
+            this.DisMV = res.result
         },
         // 最新音乐
         getNewMusic(){
-            api.getNewMusic().then(res=>{
-                this.newMusic = res.data.result
+            home.getNewMusic().then(res=>{
+                this.newMusic = res.result
                 // 处理歌曲前面的数字
                 this.newMusic.forEach((item,index) => {
                     item.index = index+1
                     if(item.index<10){
                         item.index = '0'+item.index
-                        item.artName = item.song.artists[0].name
                         item.duration = item.song.duration
                     }
                 });
-                console.log(this.newMusic);
             })
         },
         // 点击歌单前往歌单详情
         toDetails(id){
-            // console.log(id);
+            console.log(id);    
             this.$router.push({ path: '/details', query: { id: id } })
         },
+        
         // 双击歌曲播放
-        getSongMsg(a){
+        async getSongMsg(a){
+           
+            const res = await music.getMusicUrl(a.song.id)
+            // 添加到vuex中
             console.log(a);
-            this.changePlayList({
-                id:a.id,
-                name:a.name,
-                artName:a.artName,
-                duration:a.duration,
-                img:a.picUrl
-            })
+            const newMusic = {
+                id:a.song.id, // 歌曲id
+                name:a.song.name, // 歌名
+                artName:a.song.artists, // 作者
+                duration:this.getTime(a.song.duration,2), // 时长
+                img:a.picUrl, // 图片
+                url:res.data[0].url, // 歌曲url
+                alias:a.song.album.alias[0]?a.song.album.alias[0]:null, // 简介
+                mvid:a.song.mvid === 0 ? null : a.song.mvid, // mvid
+                sq: a.song.sqMusic ? true :false,// sq
+                isNowPlay:true
+            }
+            this.changePlayList(newMusic)
+            // 将当前歌曲添加到正在播放
+            this.changeNowPlay(newMusic)
+            
+        },
+        getTime(id,a){
+            if(a == 1){
+                const time = new Date(id)
+                let y = time.getFullYear()+ '-';
+                let m = (time.getMonth() + 1 < 10 ? '0' + (time.getMonth() + 1) : time.getMonth() + 1) + '-';
+                let d = (time.getDate() < 10 ? '0' + time.getDate() : time.getDate()) + ' ';
+                return y+m+d
+            }else if( a == 2){
+                const date = new Date(id)
+                let m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':';
+                let s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
+                return m+s
+            }
         }
         
     },
@@ -187,16 +225,21 @@ export default {
         // 获取最新音乐
         this.getNewMusic()
     },
-    
+    computed:{
+        ...mapState(['playList'])
+    }
 }
 </script>
 
 <style scoped lang="less">
 .Discover-music{
-    height: 90vh;
+    height: 610px;
     overflow-y: scroll;
+    overflow-x: scroll;
+    width: 804px;
     // 轮播图
     .swiper{
+        z-index: 100;
         margin: 20px;
        .el-carousel__item h3 {
             color: #475669;
@@ -227,22 +270,27 @@ export default {
             width: 15px;
             height: 15px;
         }
+        p:first-child{
+            font-weight: bolder;
+            font-size: 15px;
+        }
         .playList{
             width: 100%;
             overflow: hidden;
-            display: flex;
-            // flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
             justify-content: space-between;
             font-size: 14px;
             margin-bottom: 20px;
             .DisBox{
-                width: 170px;
+                width: 125px;
                 position: relative;
-                margin-bottom: 50px;
+                margin-bottom: 40px;
                 margin-right: 25px;
                 img{
-                    width: 170px;
-                    height: 170px;
+                    width: 125px;
+                    height: 125px;
                     border-radius: 10px;
                 }
                 p{
@@ -256,8 +304,8 @@ export default {
                     display: block;
                 }
                 .icon{
-                    width: 170px;
-                    height: 170px;
+                    width: 125px;
+                    height: 125px;
                     position: absolute;
                     img{
                         position: absolute;
@@ -285,22 +333,26 @@ export default {
             display: flex;
             align-items: center;
             margin-bottom: 20px;
-            width: 80px;
+            width: 80px;    
         }
         img{
             width: 15px;
             height: 15px;
-            border-radius: 15px;
+            border-radius: 5px;
         }
+        p:first-child{
+            font-weight: bolder;
+            font-size: 15px;
+}
         .videoList{
             display: flex;
             justify-content: space-between;
             .video{
-                width: 250px;
+                width: 170px;
                 position: relative;
                 img{
-                    width: 250px;
-                    height: 150px;
+                    width: 170px;
+                    height: 95px;
                 }
                 p{
                     overflow:hidden; // 超出隐藏
@@ -308,15 +360,16 @@ export default {
                     display:-webkit-box; // 将对象作为弹性伸缩盒子模型显示
                     -webkit-line-clamp:2; //2行文本隐藏
                     -webkit-box-orient:vertical; //定义排列方式
+                    font-size: 13px;
                 }
                 .icon{
-                    width: 250px;
-                    height: 150px;
+                    width: 170px;
+                    height: 95px;
                     position: absolute;
                     img{
                         position: absolute;
-                        width: 35px;
-                        height: 35px;
+                        width: 25px;
+                        height: 25px;
                         left: 0;
                         top: 0;
                         margin: 6px;
@@ -339,16 +392,20 @@ export default {
             width: 15px;
             height: 15px;
         }
+        p:first-child{
+            font-size: 15px;
+            font-weight: bolder;
+        }
         .MVList{
             display: flex;
             justify-content: space-between;
             .MV{
-                width: 250px;
+                width: 170px;
                 position: relative;
                 overflow: hidden;
                 img{
-                    width: 250px;
-                    height: 150px;
+                    width: 170px;
+                    height: 95px;
                     border-radius: 5px;
                 }
                 p{
@@ -357,10 +414,11 @@ export default {
                     display:-webkit-box; // 将对象作为弹性伸缩盒子模型显示
                     -webkit-line-clamp:2; //2行文本隐藏
                     -webkit-box-orient:vertical; //定义排列方式
+                    font-size: 13px;
                 }
                 .art{
-                    color: #727272;
-                    font-size: 14px;
+                    color: #909090de;
+                    font-size: 12px;
                 }
                 .count{
                     color: #fff;
@@ -368,21 +426,23 @@ export default {
                     top:0;
                     right: 0;
                     display: flex;
-                    font-size: 14px;
-                    margin: 5px;
+                    font-size: 12px;
+                    margin: 5px 10px;
                     font-weight: bolder;
                     img{
-                        width: 16px;
-                        height: 16px;
+                        width: 13px;
+                        height: 13px;
+                        margin-top: 2px;
                     }
                 }
                 .disMsg{
-                    width:235px;
-                    height: 25px;
+                    width:170px;
+                    height: 24px;
                     position: absolute;
-                    top: -25px;
+                    top: -24px;
                     padding-left: 15px;
-                    font-size: 18px;
+                    line-height: 24px;
+                    font-size: 12px;
                     color: #fff;
                     background: rgba(0, 0, 0, 0.42);
                     border-radius: 5px 5px 0 0;
@@ -402,33 +462,36 @@ export default {
     // 最新音乐
     .newMusic{
         margin: 0 20px 50px 20px;
+        overflow: hidden;
         a{
             display: flex;
             align-items: center;
             margin-bottom: 20px;
             width:80px;
         }
-        p{
-            // margin-left: 10px;
+        p:first-child{
+            font-size: 15px;
+            font-weight: bolder;
         }
         img{
             width: 15px;
             height: 15px;
         }
         .newMusicList{
-            width:100%;
-            ul{
-                width:100%;
-                li:hover{
+            width:784px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            .musicCard:hover{
                     background: #cfcfcf59;
                     border-radius:10px;
                 }
-                li{
-                    width: 46%;
+            .musicCard{
+                    box-sizing: border-box;
+                    width: 362px;
                     font-size: 14px;
                     padding: 0 10px;
-                    margin: 0 10px;
-                    float: left;
+                    margin: 0 5px;
+                   overflow: hidden;
                     display: block;
                     .left{
                         border-bottom: 1px solid rgb(224, 224, 224);
@@ -457,22 +520,61 @@ export default {
                         .num{
                             margin: 0 10px;
                             color: #bdbdbd;
+                            img{
+                                width: 15px;
+                                height: 15px;
+                                // transform: rotateX(90deg);
+                            }
                         }
                         .song{
-                            // margin-left: 30px;
+                            width:200px;
                             .name{
-                                font-size: 16px;
+                                color: rgb(77, 77, 77);
+                                font-size: 14px;
                                 margin-bottom: 5px;
+                                display: flex;
+                                white-space:nowrap;
+                                overflow:hidden;
+                                text-overflow: ellipsis;
+                                p{
+                                    font-size: 14px;
+                                    color: #adadad;
+                                    font-weight: 400;
+                                    padding-left: 5px;
+                                    white-space:nowrap;
+                                    overflow:hidden;
+                                    text-overflow: ellipsis;
+                                }
                             }
                             .art{
                                 font-size: 12px;
                                 color: #6b6b6b;
+                                display: flex;
+                                
+                                .sq{
+                                    color: #d33939;
+                                    border: 1px solid #d33939;
+                                    padding: 0 5px;
+                                    margin-right: 5px;
+                                    border-radius: 5px;
+                                }
+                                div{
+                                    white-space: nowrap;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                }
                             }
+                        }
+                        .video{
+                            font-size: 12px;
+                            color: rgb(252, 80, 80);
+                            border: 1px solid rgb(252, 80, 80);
+                            padding: 0 5px;
+                            border-radius: 5px;
+                           
                         }
                     }
                 }
-                
-            }
             ul::after{
                 content: '';
                 height: 0;

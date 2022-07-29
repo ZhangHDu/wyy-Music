@@ -7,29 +7,42 @@ const store = new vuex.Store({
             name:"",//用户名
             avatarUrl:"",//头像
             cookie:"",
-            playList:[] //播放歌单
+            playList:[], //播放歌单
+            nowplay:{}, //当前播放
        
     },
     mutations:{
+        // 更新用户名
         getName(state,name){
            return state.name = name
-        
         },
+        // 更新用户头像
         getAvatarUrl(state,url){
             return state.avatarUrl = url
          
          },
+        //  更新cookie
         getCookie(state,cookie){
             return state.cookie = cookie
         },
+        // 更新用户信息
         getUser(state,name,url,cookie){
             return state.name = name,
                     state.url = url,
                     state.cookie = cookie
         },
+        // 添加播放列表里的歌曲
         changePlayList(state,obj){
-          // 如果歌曲id已经存在，则放置最后，即当前播放音乐(暂时不做)
-            return state.playList.push(obj)
+          // 如果歌曲已经存在,不添加
+          state.playList.push(obj)
+        },
+        // 更改当前播放歌曲信息
+        changeNowPlay(state,obj){
+           state.nowplay = obj
+        },
+        // 清空播放列表
+        clearPlayList(state){
+          return state.playList = [],state.nowplay = {}
         }
     },
     plugins: [

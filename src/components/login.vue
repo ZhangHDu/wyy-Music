@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import api from '../api' //引入接口
+import login from '../http/api/login' //引入接口
 import jrQrcode from 'jr-qrcode' //引入二维码转换插件
 import {mapMutations,mapState} from 'vuex'
 export default {
@@ -97,8 +97,8 @@ export default {
             this.QRcode = '' //先清空二维码再请求
             
             let nowtime= Date.now()
-            api.getQRKey(nowtime).then(res=>{
-                let key = res.data.data.unikey
+            login.getQRKey(nowtime).then(res=>{
+                let key = res.data.unikey
                 this.getQR(key)
                 // 检测扫码状态
                 this.checkQR(key)
@@ -107,7 +107,7 @@ export default {
         },
         // 生成二维码
         getQR(key){
-            api.getQR(key).then(res => {
+            login.getQR(key).then(res => {
                 const options = {
                     padding       : 10,   // 二维码四边空白（默认为10px）
                     width         : 160,  // 二维码图片宽度（默认为256px）
@@ -117,7 +117,7 @@ export default {
                     background    : "#ffffff",    // 二维码背景颜色（默认白色）
                     foreground    : "#000000"     // 二维码颜色（默认黑色）
                 }
-                this.QRcode = jrQrcode.getQrBase64(res.data.data.qrurl, options)
+                this.QRcode = jrQrcode.getQrBase64(res.data.qrurl, options)
                 
             })
         },
@@ -125,27 +125,27 @@ export default {
         checkQR(key){
             let check = setInterval(async ()=>{
                 const timer = Date.now() //获取调用时间
-                await api.checkQR(key,timer).then(res=>{
-                console.log(res.data.message);
-                if(res.data.code == 800){
+                await login.checkQR(key,timer).then(res=>{
+                console.log(res);
+                if(res.code == 800){
                     // 超时修改扫码状态
                     this.QRtype = false
                     this.user.name = null
                     this.user.avatarUrl = null
                     clearInterval(check)
-                }else if(res.data.code == 802){
-                    this.user.name = res.data.nickname
-                    this.user.avatarUrl = res.data.avatarUrl
+                }else if(res.code == 802){
+                    this.user.name = res.nickname
+                    this.user.avatarUrl = res.avatarUrl
                     // 缓存头像以及昵称
-                    this.getName(res.data.nickname)
-                    this.getAvatarUrl(res.data.avatarUrl)
+                    this.getName(res.nickname)
+                    this.getAvatarUrl(res.avatarUrl)
                     // this.user.cookie = res.data.cookie
-                }else if(res.data.code == 803){
+                }else if(res.code == 803){
                     // 提示框，提示登录成功
                     
                     // 关闭登录框
                     this.closeLogin()
-                    this.getCookie(res.data.cookie)
+                    this.getCookie(res.cookie)
                     clearInterval(check)
                 }else if(this.isShow === false||this.isOther === true){
                     // 不显示二维码时清除定时器

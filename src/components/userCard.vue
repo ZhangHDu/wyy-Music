@@ -89,14 +89,14 @@
 
 <script>
 import {mapMutations} from 'vuex'
-import api from '../api'
+import login from '../http/api/login'
 export default {
     props:['value'],
     methods:{
         ...mapMutations(['getUser']),//获取修改vue的方法
         async logout(){
-            const res = await api.Logout()
-            if(res.data.code === 200){
+            const res = await login.Logout()
+            if(res.code === 200){
                 console.log('退出登录成功！');
                 // 清除vuex中的用户信息
                 this.getUser('未登录','','')
