@@ -23,13 +23,18 @@
                 <div class="PBIcon" >
                   <img v-if="item.isNowPlay" src="../assets/images/pause.png" alt="">
                 </div>
-                <div class="singname">{{item.name}}</div>
-                <div class="alias" v-if="item.alias">&nbsp;{{"("+item.alias+")"}}</div>
+                <div class="singname" v-if="!item.isNowPlay">{{item.name}}</div>
+                <div class="singname" v-if="item.isNowPlay" style="color:#d81e06;">{{item.name}}</div>
+                <div class="alias" v-if="item.alias&&!item.isNowPlay">&nbsp;{{"("+item.alias+")"}}</div>
+                <div class="alias" v-if="item.alias&&item.isNowPlay" style="color:#d81e06;">&nbsp;{{"("+item.alias+")"}}</div>
                 <div class="sq" v-if="item.sq">SQ</div>
                 <div class="mv" v-if="item.mvid">MV</div>
               </div>
               <div class="PBRight">
-                  <div class="singer" >
+                  <div class="singer" v-if="item.isNowPlay" style="color:#d81e06;">
+                    <div v-for="art in item.artName" :key="art.index">{{art.name}}</div>
+                  </div>
+                  <div class="singer" v-else>
                     <div v-for="art in item.artName" :key="art.index">{{art.name}}</div>
                   </div>
                   <div class="songtimes">{{item.duration}}</div>
@@ -112,7 +117,7 @@ export default {
         }
     },
     methods:{
-        ...mapMutations(['clearPlayList']),
+        ...mapMutations(['clearPlayList','changeIsNowPlay']),
         // 是否播放
         isPlay(){
             if(this.playData.url){
@@ -168,11 +173,7 @@ export default {
         }
       },
       playList(){
-        this.playList.forEach(item => {
-            if(item.id !== this.nowplay.id){
-              item.isNowPlay = false
-            }
-        });
+        this.changeIsNowPlay()
       },
       // 通过控制is_play属性来决定播放和暂停
       is_play(){
@@ -306,15 +307,25 @@ export default {
                 }
               }
               .songtimes{
+                margin-right:30px;
                 color: #a6a6a6;
               }
         }
           }
           li:nth-child(2n){
-            background-color: rgb(242, 242, 242);
+            background-color: rgb(250, 250, 250);
           }
           li:hover{
-            background-color: rgb(238, 238, 238);
+            
+            background-color: rgb(245, 245, 245);
+            .PBRight{
+              .singer{
+                color:#000;
+              }
+              .songtimes{
+                color:#000;
+              }
+            }
           }
         }
       }

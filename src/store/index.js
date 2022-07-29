@@ -43,6 +43,14 @@ const store = new vuex.Store({
         // 清空播放列表
         clearPlayList(state){
           return state.playList = [],state.nowplay = {}
+        },
+        // 是否播放标签修改
+        changeIsNowPlay(state){
+          state.playList.forEach(item => {
+            if(item.id !== state.nowplay.id){
+              item.isNowPlay = false
+            }
+        });
         }
     },
     plugins: [
