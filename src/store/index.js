@@ -38,7 +38,8 @@ const store = new vuex.Store({
         },
         // 更改当前播放歌曲信息
         changeNowPlay(state,obj){
-           state.nowplay = obj
+          // 赋值
+          state.nowplay = obj
         },
         // 清空播放列表
         clearPlayList(state){
@@ -49,9 +50,11 @@ const store = new vuex.Store({
           state.playList.forEach(item => {
             if(item.id !== state.nowplay.id){
               item.isNowPlay = false
+            }else{
+              item.isNowPlay = true
             }
         });
-        }
+        },
     },
     plugins: [
 		createPersistedState({

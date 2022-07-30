@@ -18,10 +18,11 @@
         </div>
         <div class="playBottom" v-show="playList.length">
           <ul>
-            <li v-for="item in playList" :key="item.index">
+            <li v-for="item in playList" :key="item.index" @dblclick="playNow(item)">
               <div class="PBLeft">
                 <div class="PBIcon" >
-                  <img v-if="item.isNowPlay" src="../assets/images/pause.png" alt="">
+                  <img v-if="item.isNowPlay && !is_play" src="../assets/images/pause.png" alt="">
+                  <img v-if="item.isNowPlay && is_play" src="../assets/images/播放2.png" alt="">
                 </div>
                 <div class="singname" v-if="!item.isNowPlay">{{item.name}}</div>
                 <div class="singname" v-if="item.isNowPlay" style="color:#d81e06;">{{item.name}}</div>
@@ -32,12 +33,12 @@
               </div>
               <div class="PBRight">
                   <div class="singer" v-if="item.isNowPlay" style="color:#d81e06;">
-                    <div v-for="art in item.artName" :key="art.index">{{art.name}}</div>
+                    <div>{{item.artName}}</div>
                   </div>
                   <div class="singer" v-else>
-                    <div v-for="art in item.artName" :key="art.index">{{art.name}}</div>
+                     <div>{{item.artName}}</div>
                   </div>
-                  <div class="songtimes">{{item.duration}}</div>
+                  <div class="songtimes">{{item.time}}</div>
               </div>
             </li>
           </ul>
@@ -53,16 +54,16 @@
             <div class="name">
               <!-- 歌名 -->
               <div class="songName">
-                {{playData.name}}&nbsp;&nbsp;
+                {{playData.name}}&nbsp;
               </div>
               <!-- 歌手 -->
               <div class="art" v-show="playData.artName">
-                <div v-for="art in playData.artName" :key="art.index">-&nbsp;{{art.name}}</div>
+                {{"-"+" "+playData.artName}}
                 
               </div>
             </div>
             <!-- 歌曲时长 -->
-            <div class="time" v-show="playData.duration">00:00/{{playData.duration}}</div>
+            <div class="time" v-show="playData.duration">{{playData.switchTime}}/{{playData.time}}</div>
           </div>
         </div>
       <!-- 播放控件 -->
@@ -114,10 +115,11 @@ export default {
             // 在播放音乐的属性
             playData:{},
             isShowList:false,
+            timer:null, // 是否清除定时器
         }
     },
     methods:{
-        ...mapMutations(['clearPlayList','changeIsNowPlay']),
+        ...mapMutations(['clearPlayList','changeIsNowPlay','changeNowPlay']),
         // 是否播放
         isPlay(){
             if(this.playData.url){
@@ -149,13 +151,47 @@ export default {
             // 前往个性推荐页
             this.$router.push('/Discover-music')
           }
+        },
+        // 双击播放列表
+        playNow(a){
+          a.runTime = 0
+          this.changeNowPlay(a)
+        },
+        // 播放时长随时间增加
+        timeRun(){
+            clearInterval(this.timer)
+            this.timer = setInterval(()=>{
+              if(!this.is_play || this.playData.runTime >= this.playData.duration){
+                // 当按下暂停或者播放时间大于歌曲时长时，清除定时器
+                clearInterval(this.timer)
+              }else if(this.is_play && this.playData.runTime < this.playData.duration){
+                // 当按下播放键并且此时播放时间小于歌曲时长，继续添加时间
+                this.playData.runTime+=1000
+                this.playData.switchTime = this.getTime(this.playData.runTime,2)
+                
+              }
+            },1000)
+        },
+        getTime(id,a){
+            if(a == 1){
+                const time = new Date(id)
+                let y = time.getFullYear()+ '-';
+                let m = (time.getMonth() + 1 < 10 ? '0' + (time.getMonth() + 1) : time.getMonth() + 1) + '-';
+                let d = (time.getDate() < 10 ? '0' + time.getDate() : time.getDate()) + ' ';
+                return y+m+d
+            }else if( a == 2){
+                const date = new Date(id)
+                let m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':';
+                let s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
+                return m+s
+            }
         }
     },
     created(){
           // 获取正在播放到歌曲信息
-          this.playData = this.nowplay 
+          this.playData = this.nowplay
     },
-    mounted(){
+    beforeDestory(){
       
     },
     computed:{
@@ -166,6 +202,8 @@ export default {
         if(this.nowplay.id){
           this.is_play = false
           this.playData = this.nowplay
+          // 是否当前播放标签
+          this.changeIsNowPlay()
           setTimeout(()=>{
             console.log('开始播放音乐');
             this.is_play = true
@@ -179,9 +217,12 @@ export default {
       is_play(){
         if(this.is_play){
             this.$refs.audio.play() // 播放
+            
         }else{
             this.$refs.audio.pause() // 暂停
+            
         }
+        this.timeRun()
       }
     }
 }
@@ -300,14 +341,16 @@ export default {
               align-items: center;
               justify-content: space-between;
               .singer{
+                width: 75px;
                 color: #767676;
-                display: flex;
                 div{
-                  margin-right: 10px;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
                 }
               }
               .songtimes{
-                margin-right:30px;
+                
                 color: #a6a6a6;
               }
         }
@@ -337,9 +380,10 @@ export default {
     }
     .bottom{
       display: flex;
-      
+      justify-content: space-between;
       height: 60px;
       .left{
+        width: 320px;
         display: flex;
         img{
           width: 40px;
@@ -355,22 +399,21 @@ export default {
           justify-content: space-around;
           .name{
             display: flex;
-            width: 280px;
+            // width: 280px;
+            align-items: center;
             .songName{
-              width: 160px;
+              max-width: 200px;
               white-space: nowrap;
               overflow: hidden;
               text-overflow: ellipsis;
             }
             .art{
+              max-width: 130px;
               font-size: 12px;
               color: #8a8a8a;
-              display: flex;
-              div{
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-              }
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
             }
           
           }
@@ -381,9 +424,9 @@ export default {
         }
     }
       .middle{
+        width: 450px;
         display: flex;
         align-items: center;
-        
         img{
           width: 20px;
           

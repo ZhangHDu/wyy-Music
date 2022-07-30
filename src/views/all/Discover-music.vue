@@ -176,22 +176,35 @@ export default {
         
         // 双击歌曲播放
         async getSongMsg(a){
-           
+            // 获取双击歌曲的数据
             const res = await music.getMusicUrl(a.song.id)
             // 添加到vuex中
             console.log(a);
+            // 处理作者名称
+            const art = []
+            // 多作者存储到数组中
+            a.song.artists.forEach(item=>{
+                art.push(item.name)
+            })
+            // 数组转化为字符串
+            const artStr = art.join(' / ')
+            // 整理数据
             const newMusic = {
                 id:a.song.id, // 歌曲id
                 name:a.song.name, // 歌名
-                artName:a.song.artists, // 作者
-                duration:this.getTime(a.song.duration,2), // 时长
+                artName:artStr, // 作者
+                duration:a.song.duration, // 时长
+                time:this.getTime(a.song.duration,2),
                 img:a.picUrl, // 图片
                 url:res.data[0].url, // 歌曲url
                 alias:a.song.album.alias[0]?a.song.album.alias[0]:null, // 简介
                 mvid:a.song.mvid === 0 ? null : a.song.mvid, // mvid
                 sq: a.song.sqMusic ? true :false,// sq
-                isNowPlay:true
+                isNowPlay:true, // 是否立即播放
+                runTime:0, // 播放进度
+                switchTime:"00:00", // 转换后的时间
             }
+            // 添加到歌单列表中
             this.changePlayList(newMusic)
             // 将当前歌曲添加到正在播放
             this.changeNowPlay(newMusic)
