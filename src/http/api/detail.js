@@ -10,7 +10,7 @@ const detail = {
      // 歌单所有歌曲
      getDetailsSong(id){
         return service({
-            url: "/playlist/track/all?id="+id+"&limit=10&offset=1",
+            url: "/playlist/track/all?id="+id,
             method: "get",
         })
     },

@@ -10,18 +10,18 @@
                                 <div class="right">
                                     <!-- 评论 -->
                                     <div class="rightTop">
-                                        <div class="name">{{item.user.nickname}}:&nbsp;</div>
-                                        <div class="content">{{item.content}}</div>
+                                        <span class="name">{{item.user.nickname}}:&nbsp;</span>
+                                        <span class="content">{{item.content}}</span>
                                     </div>
                                     <!-- 评论回复 -->
                                     <div class="rightMiddle" v-if="item.beReplied.length">
-                                        <p class="RPname">@{{item.beReplied[0].user.nickname}}:</p>&nbsp;
-                                        <p class="RPcontent">{{item.beReplied[0].content}}</p>
+                                        <span class="RPname">@{{item.beReplied[0].user.nickname}}:</span>&nbsp;
+                                        <span class="RPcontent">{{item.beReplied[0].content}}</span>
                                     </div>
                                     <!-- 评论时间以及点赞分享评论按钮 -->
                                     <div class="rightBottom">
                                         <!-- 发布时间 -->
-                                        <div class="time">{{item.time}}</div>
+                                        <div class="time">{{item.timeStr}}</div>
                                         <div class="btn">
                                             <!-- 举报 -->
                                             <div class="jb">举报</div>
@@ -36,7 +36,7 @@
                                             <div class="fx">
                                                 <img src="../assets/images/分享2.png" alt="">
                                             </div>
-                                            <!-- 评论@ -->
+                                            <!-- 评论 -->
                                             <div class="pl">
                                                 <img src="../assets/images/评论.png" alt="">
                                             </div>
@@ -60,7 +60,6 @@ export default {
     watch:{
         comments(){
             this.commentsList = this.comments
-            console.log(this.commentsList);
         }
     }
 }
@@ -83,7 +82,6 @@ export default {
             width: 709px;
             border-bottom: 1px solid rgba(161, 161, 161, 0.414);
             .rightTop{
-                    display: flex;
                     font-size: 13px;
                     padding-bottom: 7px;
                     color: rgb(27, 27, 27);
@@ -97,11 +95,12 @@ export default {
                 font-size: 13px;
                 background-color: rgba(230, 230, 230, 0.538);
                 padding: 8px;
-                display: flex;
                 border-radius: 6px;
                 margin-bottom: 8px;
                 .RPname{
                     color: rgb(102, 161, 225);
+                    white-space: nowrap;
+                    float: left;
                 }
                 .RPcontent{
                     color: rgb(120, 120, 120);

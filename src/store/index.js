@@ -9,7 +9,7 @@ const store = new vuex.Store({
             cookie:"",
             playList:[], //播放歌单
             nowplay:{}, //当前播放
-       
+            topStyle:false
     },
     mutations:{
         // 更新用户名
@@ -19,7 +19,6 @@ const store = new vuex.Store({
         // 更新用户头像
         getAvatarUrl(state,url){
             return state.avatarUrl = url
-         
          },
         //  更新cookie
         getCookie(state,cookie){
@@ -33,12 +32,21 @@ const store = new vuex.Store({
         },
         // 添加播放列表里的歌曲
         changePlayList(state,obj){
-          // 如果歌曲已经存在,不添加
+          // 先判断添加的歌曲是否已存在播放列表中
+          state.playList.some((item,i)=>{
+            if(item.id == obj.id){
+              // 删除已存在项
+              state.playList.splice(i,1)
+              return true
+            }
+          })
+          // 添加到歌单末尾
           state.playList.push(obj)
         },
         // 更改当前播放歌曲信息
         changeNowPlay(state,obj){
-          // 赋值
+          // 重置播放时间
+          // obj.switchTime = '00:00'
           state.nowplay = obj
         },
         // 清空播放列表
@@ -47,14 +55,26 @@ const store = new vuex.Store({
         },
         // 是否播放标签修改
         changeIsNowPlay(state){
-          state.playList.forEach(item => {
+            state.playList.forEach(item => {
             if(item.id !== state.nowplay.id){
               item.isNowPlay = false
             }else{
               item.isNowPlay = true
             }
-        });
+            }); 
         },
+        // 替换播放列表
+        replacePlayList(state,obj){
+          state.playList = []
+          state.playList = obj
+        },
+        // 添加播放列表
+        addPlayList(state,obj){
+          state.playList = [...state.playList,...obj]
+        },
+        changeTopStyle(state,a){
+          return state.topStyle = a
+        }
     },
     plugins: [
 		createPersistedState({

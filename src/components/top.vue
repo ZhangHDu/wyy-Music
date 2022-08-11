@@ -32,19 +32,29 @@
           </div>
           <div class="base">
             <div class="search">
-              <input type="text" value="孤勇者">
+              <input type="text" value="孤勇者" :style="changeStyle">
             </div>
-            <div class="set">
+            <div class="set" v-if="!topStyle">
               <div class="setbtn">
-                  <img src="../assets/images/设置.png" alt="">
+                  <img src="../assets/images/设置白.png" alt="">
               </div>
-               <div class="msg">
-                     <img src="../assets/images/信息.png" alt="">
+               <!-- <div class="msg">
+                     <img src="../assets/images/邮件白.png" alt="">
                </div>
               <div class="skill">
-                    <img src="../assets/images/衣服.png" alt="">
+                    <img src="../assets/images/衣服白.png" alt="">
+              </div> -->
+          </div>
+           <div class="set" v-if="topStyle">
+              <div class="setbtn">
+                  <img src="../assets/images/设置黑.png" alt="">
               </div>
-             
+               <!-- <div class="msg">
+                     <img src="../assets/images/邮件黑.png" alt="">
+               </div>
+              <div class="skill">
+                    <img src="../assets/images/衣服黑.png" alt="">
+              </div> -->
           </div>
           </div>
           
@@ -53,9 +63,17 @@
 </template>
 
 <script>
-export default {
+import {mapState,mapMutations} from 'vuex'
+export default { 
+    data(){
+      return{
+        changeStyle:'background:#fc9b8e;color:rgba(255, 255, 255, 0.742);', //搜索框样式
+        setStyle:''
+      }
+    },
     props:['all'],
     methods:{
+      ...mapMutations(['changeTopStyle']),
       preRouter(){
         this.$router.go(-1)
       },
@@ -64,11 +82,24 @@ export default {
       }
     },
     created(){
-       
+       this.changeTopStyle(false)
     },
     watch:{
-        
-    }
+      topStyle(){
+        if(this.topStyle){
+          // 白色
+          setTimeout(()=>{
+            this.changeStyle = "background:rgb(230, 232, 232);color: #2c2c2c;"
+          },350)
+        }else{
+          // 红色
+          this.changeStyle = "background:#fc9b8e;color: rgba(255, 255, 255, 0.742);"
+        }
+      }
+    },
+    computed:{
+      ...mapState(['topStyle'])
+    },
 }
 </script>
 
@@ -76,9 +107,6 @@ export default {
 .head{
     display: flex;
     width: 100%;
-    // position: fixed;
-    // top: 0;
-
     .top{
           height: 50px;
           width: 196px;
@@ -90,26 +118,24 @@ export default {
             display: flex;
             margin-top: 10px;
             margin-left: 10px;
+            position: relative;
             div{
-              margin-right: 5px;
+              position: absolute;
+              z-index: 9999;
+              width: 12px;
+              height: 12px;
+              border-radius: 50%;
             }
             .red{
-              width: 15px;
-              height: 15px;
               background-color: #ec7070;
-              border-radius: 50%;
             }
             .yellow{
-              width: 15px;
-              height: 15px;
               background-color: rgb(241, 217, 78);
-              border-radius: 50%;
+              left: 20px;
             }
             .green{
-              width: 15px;
-              height: 15px;
               background-color: rgb(96, 212, 96);
-              border-radius: 50%;
+              left: 40px;
             }
           }
           .top-right{
@@ -155,6 +181,9 @@ export default {
           }
           .base{
             display: flex;
+            position: absolute;
+            right: 0;
+            z-index: 9999;
             .search{
             line-height: 50px;
             input{
@@ -162,17 +191,17 @@ export default {
               padding: 0;
               border: 0;
               border-radius: 12.5px;
-              background: #fc9b8e;
+              font-size: 12px;
               outline: none;
               padding-left: 20px;
-              color: rgba(255, 255, 255, 0.742);
+              // background: #fc9b8e;
+              // color: rgba(255, 255, 255, 0.742);
             }
           }
           .set{
               display: flex;
               align-items: center;
               margin-right: 10px;
-             
               div{
                   margin: 0 10px;
                   width: 30px;

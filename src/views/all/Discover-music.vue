@@ -66,9 +66,12 @@
                                     <div class="sq" v-show="item.song.sqMusic">
                                         SQ
                                     </div>
-                                    <div v-for="arts in item.song.artists" :key="arts.index">
-                                        {{arts.name}}&nbsp;&nbsp;
+                                    <div class="artList">
+                                         <div v-for="arts in item.song.artists" :key="arts.index">
+                                            {{arts.name}}&nbsp;&nbsp;
+                                        </div>
                                     </div>
+                                   
                                    
                                 </div>
                             </div>
@@ -203,6 +206,7 @@ export default {
                 isNowPlay:true, // 是否立即播放
                 runTime:0, // 播放进度
                 switchTime:"00:00", // 转换后的时间
+                for:'发现页'
             }
             // 添加到歌单列表中
             this.changePlayList(newMusic)
@@ -570,10 +574,13 @@ export default {
                                     padding: 0 5px;
                                     margin-right: 5px;
                                     border-radius: 5px;
+                                    flex-shrink: 0;
                                 }
-                                div{
-                                    white-space: nowrap;
-                                    overflow: hidden;
+                                .artList{
+                                    width: 150px;
+                                    display: flex;
+                                    white-space:nowrap;
+                                    overflow:hidden;
                                     text-overflow: ellipsis;
                                 }
                             }

@@ -1,5 +1,7 @@
 <template>
   <div class="Details">
+        <!-- 是否替换列表 -->
+        <isRepeat v-if="isShowRepeat" :nowplay="musicDetails[0]" v-model="isShowRepeat" />
       <!-- 加载中 -->
         <div class="loading" v-show="!details.songs.length || isChange">
             <div class="loadingBox">
@@ -9,7 +11,7 @@
             </div>
         </div>
       <!-- 歌单详情 -->
-      <div class="msg" v-show="details.songs.length">
+      <div class="msg" v-if="details.songs.length">
           <!-- 歌单图片 -->
           <div class="msgLeft" >
               <img :src="details.coverImgUrl" alt="">
@@ -33,11 +35,11 @@
               <!-- 播放全部，收藏，分享，下载全部 -->
               <div class="allBtn">
                   <div class="playAll">
-                      <div class="left">
-                          <img src="../../assets/images/播放 (2).png" alt="">
-                          <p>播放全部</p>
+                      <div class="left" @click="allPlay">
+                          <img src="../../assets/images/播放 (2).png" alt="" >
+                          <p >播放全部</p>
                       </div>
-                      <div class="right">
+                      <div class="right" @click="addAll">
                           <img src="../../assets/images/添加.png" alt="">
                       </div>
                   </div>
@@ -83,7 +85,7 @@
           </div>
       </div>
       <!-- 歌曲列表 -->
-      <div class="list" v-show="details.songs.length">
+      <div class="list" v-if="details.songs.length">
           <!-- 列表 -->
             <el-tabs v-model="activeName" @tab-click="handleClick">
                 <el-tab-pane label="歌曲列表" name="first">
@@ -91,6 +93,7 @@
                         :data="details.songs"
                         lazy
                         stripe
+                        @row-dblclick="dbPlay"
                         style="width: 100%">
                             <!-- 序号 -->
                             <el-table-column
@@ -130,7 +133,7 @@
                             </el-table-column>
                             <!-- 时长 -->
                             <el-table-column
-                            prop="dt"
+                            prop="time"
                             width="70"
                             label="时长">
                             </el-table-column>
@@ -166,13 +169,12 @@
                        </div>
                     </div>
                     <div class="comments">
-                        <div class="title" v-show="details.hotComments.length">精彩评论</div>
+                        <div class="title">精彩评论</div>
                         <!-- 评论组件 -->
                         <comments :comments="details.hotComments" />
                         <div class="title">最新评论</div>
                         <!-- 评论组件 -->
                         <comments :comments="details.comments" />
-                       
                     </div>
                 </el-tab-pane>
                 <!-- 收藏 -->
@@ -204,13 +206,17 @@
                 </el-tab-pane>
             </el-tabs>
       </div>
+     
   </div>
 </template>
 
 <script>
+import isRepeat from '../../components/isRepeat'
 import detail from '../../http/api/detail'
 import user from '../../http/api/user'
+import music from '../../http/api/music'
 import comments from '../../components/comments'
+import {mapMutations,mapState} from 'vuex'
 export default {
     name:'Details',
     data(){
@@ -221,7 +227,6 @@ export default {
                 name:null, // 歌单名
                 createTime:null, // 创建时间
                 avatarUrl:null, // 创建者头像
-                // creator:null, // 创建者信息
                 commentCount:null, // 评论数量
                 tags:[], // 标签
                 description:'', // 简介
@@ -240,18 +245,21 @@ export default {
             isFirst:true, // 是否第一次加载
             isChange:false, // 是否切换路由
             textarea:"", // 评论
+            musicDetails:[],
+            isShowRepeat:false
         }
     },
     components:{
-        comments
+        comments,
+        isRepeat
     },
     methods:{
+         ...mapMutations(['clearPlayList','replacePlayList','changeNowPlay','addPlayList','changePlayList']),
         // 获取歌单详情
         async getDetails(id){
             if(!this.isFirst){
                 this.isChange = true
             }
-            
             const res = await detail.getDetails(id)
             const {coverImgUrl,name,createTime,commentCount,creator,tags,description,trackCount,playCount,userId,subscribedCount,shareCount} = res.playlist
             // 获取歌单封面
@@ -302,7 +310,7 @@ export default {
             const allSong = await detail.getDetailsSong(id)
             this.details.songs = allSong.songs
             this.details.songs.forEach(item => {
-                item.dt = this.getTime(item.dt,2)
+                item.time = this.getTime(item.dt,2)
             });
         },
         // 获取歌单评论
@@ -310,14 +318,14 @@ export default {
             const res = await detail.getDetailsComment(id)
             // 最新评论
             this.details.comments = res.comments
-            this.details.comments.forEach((item)=>{
-                item.time = this.getTime(item.time,1)
-            })
+            // this.details.comments.forEach((item)=>{
+            //     item.time = this.getTime(item.time,1)
+            // })
             // 热评
             this.details.hotComments = res.hotComments
-            this.details.hotComments.forEach((item)=>{
-                item.time = this.getTime(item.time,1)
-            })
+            // this.details.hotComments.forEach((item)=>{
+            //     item.time = this.getTime(item.time,1)
+            // })
         },
         // 转换时间戳
         getTime(id,a){
@@ -347,22 +355,88 @@ export default {
             if(!this.isFirst){
                 this.isChange = false
             }
-            
         },
         // tabs切换事件
         async handleClick(tab) {
             console.log(tab.index);
-            if(tab.index == 1){
-                 console.log("评论区");
-                
-            }else if(tab.index == 2){
-                console.log("收藏者");
-                
-            }
         },
         // 简介隐藏和显示
         showLong(){
             this.longOrshort = !this.longOrshort
+        },
+        // 播放全部，替换播放列表，立即播放
+        allPlay(){
+                console.log('替换当前播放列表');
+                this.musicDetails = []
+                // 获取所有歌曲详情，并整理好数据
+                this.musicDetail()
+                // 替换播放列表
+                this.replacePlayList(this.musicDetails)
+                // 播放第一首歌曲   
+                this.isShowRepeat = true  
+                // setTimeout(()=>{
+                //     this.changeNowPlay(this.musicDetails[0])
+                // },1)
+        },
+        // 全部添加到播放列表，不播放
+        addAll(){
+            console.log('将歌单到歌添加到播放列表中');
+            // this.musicDetails = []
+            // this.musicDetail()
+            // this.addPlayList(this.musicDetails)
+            
+        },
+        // 获取歌单歌曲详情
+        musicDetail(){
+            this.details.songs.forEach(async(item)=>{
+                const res = await music.getMusicUrl(item.id)
+                const obj = {
+                    id:item.id, // 歌曲id
+                    name:item.name, // 歌名
+                    artName:item.ar[0].name, // 作者
+                    duration:item.dt, // 时长
+                    time:this.getTime(item.dt,2),
+                    img:item.al.picUrl, // 图片
+                    url:res.data[0].url, // 歌曲url
+                    alias:null, // 简介
+                    mvid:item.mv === 0 ? null : item.mv, // mvid
+                    sq: item.sq ? true :false,// sq
+                    isNowPlay:false, // 是否立即播放
+                    runTime:null, // 播放进度
+                    switchTime:"00:00", // 转换后的时间
+                    fee:item.fee, // 0免费 1Vip 4购买专辑 8非会员可以播放低音质
+                    for:this.details.name, // 歌曲来源
+               }
+                this.musicDetails.push(obj)
+            })
+            
+        },
+        async dbPlay(row){
+            console.log(row);
+            // this.changeNowPlay(row.al)
+            this.musicDetails = []
+                // 获取所有歌曲详情，并整理好数据
+            this.musicDetail()
+                // 替换播放列表
+            this.replacePlayList(this.musicDetails)
+            const res = await music.getMusicUrl(row.id)
+            const newMusic = {
+                id:row.id, // 歌曲id
+                name:row.name, // 歌名
+                artName:row.ar[0].name, // 作者
+                duration:row.dt, // 时长
+                time:row.time,
+                img:row.al.picUrl, // 图片
+                url:res.data[0].url, // 歌曲url
+                mvid:row.mv === 0 ? null : row.mv, // mvid
+                sq: row.sq ? true :false,// sq
+                isNowPlay:true, // 是否立即播放
+                runTime:0, // 播放进度
+                switchTime:"00:00", // 转换后的时间
+                for:this.details.name
+            }
+            this.changePlayList(newMusic)
+            this.changeNowPlay(newMusic)
         }
     },
     created(){ 
@@ -375,18 +449,20 @@ export default {
               //  获取收藏者
              this.getSubs(this.$route.query.id) 
              this.isFirst = false 
+             
         }
+        
     },
-    mounted(){
-        
-        
-        
+    computed:{
+      ...mapState(['playList','nowplay'])
     },
     watch:{
        $route(){
             //    当路由发送变化的时候（二次进入路由
            // 判断id有无值，有值才发请求获取歌单详情
            if(this.$route.query.id){
+                // 选项卡默认第一个
+                this.activeName = "first"
                 // 重新加载
                 // 获取详情
                 this.getDetails(this.$route.query.id) 
@@ -610,7 +686,11 @@ export default {
     }
     .list{
         margin-left:20px;
+        margin-bottom: 74px;
         // 修改tabs组件样式
+        ::v-deep .el-tabs__item{
+            font-size: 13px;
+        }
         ::v-deep .el-tabs__item.is-active {
             color: rgb(208, 13, 13);
         }
