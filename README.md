@@ -9,3 +9,9 @@ npm install
 ```
 npm run serve
 ```
+### 服务器
+```
+node app.js
+or
+PORT=4000 node app.js
+```
