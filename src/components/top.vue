@@ -67,7 +67,7 @@ import {mapState,mapMutations} from 'vuex'
 export default { 
     data(){
       return{
-        changeStyle:'background:#fc9b8e;color:rgba(255, 255, 255, 0.742);', //搜索框样式
+        changeStyle:'background: rgb(221, 109, 94);color:rgba(255, 255, 255, 0.742);', //搜索框样式
         setStyle:''
       }
     },
@@ -93,7 +93,7 @@ export default {
           },350)
         }else{
           // 红色
-          this.changeStyle = "background:#fc9b8e;color: rgba(255, 255, 255, 0.742);"
+          this.changeStyle = "background: rgb(221, 109, 94);color: rgba(255, 255, 255, 0.742);"
         }
       }
     },
@@ -110,7 +110,7 @@ export default {
     .top{
           height: 50px;
           width: 196px;
-          background: #f24d37;
+          background: #da5948;
           display: flex;
           justify-content: space-between;
           .top-left{
@@ -157,14 +157,14 @@ export default {
          .title{
           width: 100%;
           height: 50px;
-          background: #f56552;
+          
+          background: #d75341;
           display: flex;
           justify-content: space-between;
-          
           .aside{
             display: flex;
             align-items: center;
-            font-size: 17px;
+            font-size: 14px;
             margin-left: 10px;
             color: rgba(255, 255, 255, 0.742);
             a{

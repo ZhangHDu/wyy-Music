@@ -465,6 +465,7 @@ export default {
           });
           
         },
+        // 播放相似歌曲
         async playThis(item){
            const res = await music.getMusicUrl(item.id)
            const newMusic = {

@@ -95,10 +95,11 @@ export default {
         async getQRKey(){
             this.isShow = true
             this.QRcode = '' //先清空二维码再请求
-            
+            // 获取当前时间
             let nowtime= Date.now()
             login.getQRKey(nowtime).then(res=>{
                 let key = res.data.unikey
+                // 生成二维码
                 this.getQR(key)
                 // 检测扫码状态
                 this.checkQR(key)
