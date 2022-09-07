@@ -1,17 +1,5 @@
 import service from '../index.js'
 const user = {
-    // // 获取音乐url
-    // getMusicUrl(id){
-    //     return axios.get(base.host+'/song/url?id='+id)
-    // },
-    // // 私人FM
-    // getFM(){
-    //     return axios.get(base.host+'/personal_fm')
-    // },
-    // // 退出登录
-    // Logout(){
-    //     return axios.get(base.host+'/logout')
-    // },
     // 用户详情
     getUser(id){
         return service({
@@ -19,10 +7,19 @@ const user = {
             method: "get",
         })
     },
-
-    // // 搜索
-    // Search(name){
-    //    return axios.get(base.host+'/search?keywords='+name)
-    // }
+    // 账号信息
+    getAccount(){
+        return service({
+            url: "/user/account",
+            method: "get",
+        })
+    },
+    // 用户歌单
+    getSubcount(){
+        return service({
+            url: "/user/subcount",
+            method: "get",
+        })
+    }
 }
 export default user

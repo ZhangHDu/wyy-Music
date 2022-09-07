@@ -451,7 +451,6 @@ export default {
              this.isFirst = false 
              
         }
-        
     },
     computed:{
       ...mapState(['playList','nowplay'])
@@ -500,7 +499,7 @@ export default {
         width: 100%;
         position: absolute;
         background-color: rgb(255, 255, 255);
-        z-index: 9999;
+        z-index: 996;
         .loadingBox{
             width: 105px;
             height: 105px;

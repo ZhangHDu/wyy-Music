@@ -44,6 +44,7 @@
           </ul>
         </div>
       </div>
+      <!-- 歌曲详情 -->
       <div class="songDetail" ref="songDetail" :style="detailStyle">
         <div class="SDTop">
 
@@ -169,7 +170,7 @@
               <div class="simiright">
                 <div class="smrT">
                   <div class="siminame">
-                    {{item.album.name}}&nbsp;
+                    {{item.name}}&nbsp;
                   </div>
                   <div class="smalias" v-if="item.alias">
                     {{item.alias[0]}}
@@ -186,8 +187,12 @@
         </div>
       </div>
       <!-- 进度条 -->
-      <div class="top">
-        <div class="light" ref="light" :style="long"></div>
+      <div class="top" @click="toThisTime">
+        <!-- 实际进度条 -->
+        <div class="light" ref="light" :style="long">
+          <!-- 圆点 -->
+          <div class="btn"></div>
+        </div>
       </div>
       <div class="bottom">
          <div class="left">
@@ -498,8 +503,8 @@ export default {
           // 重新获取包含歌单
           this.getSimiList(item.id)
         },
+        // 包含这首歌的歌单跳转
         toDetails(id){
-          
           if(this.$route.query.id == id){
             this.showDetail = false
             this.changeTopStyle(this.showDetail)
@@ -509,6 +514,17 @@ export default {
             this.changeTopStyle(this.showDetail)
           }
           
+          
+        },
+        // 点击进度条事件
+        toThisTime(e){
+          if(this.playData.duration){
+            // 获取点击位置，按百分比转换成时间
+            let thisTime = this.playData.duration*e.offsetX/10000
+          // 控制进度条
+            let audio = this.$refs.audio
+            audio.currentTime = thisTime/100
+          }
           
         }
     },
@@ -591,7 +607,7 @@ export default {
       },
       // 控制唱片旋转
       long(){
-        this.blackStyle = "transform: rotate("+(this.$refs.audio.currentTime/this.$refs.audio.duration)*1500+"deg);"
+        // this.blackStyle = "transform: rotate("+(this.$refs.audio.currentTime/this.$refs.audio.duration)*1500+"deg);"
         // console.log(this.$refs.audio.currentTime);
       },
     }
@@ -604,7 +620,7 @@ export default {
     position: absolute;
     top: 600px;
     background: #fff;
-    z-index: 999;
+    z-index: 998;
     // 当前播放
     .list{
       height: 550px;
@@ -751,6 +767,7 @@ export default {
       overflow-y: scroll;
       background: rgb(243, 243, 243);
       position:absolute;
+      z-index:1400;
       top: 70px;
       left: 0;
       transition: top 0.5s ease;
@@ -1000,15 +1017,35 @@ export default {
       background-color: #eaeaea;
       position: absolute;
       top: -2px;
+      z-index: 9999 !important;
       .light{
         height:2px;
         background-color: rgb(206, 8, 8);
+        position: relative;
+        .btn{
+          display:none;
+          position: absolute;
+          right: -5px;
+          top: -4px;
+          height: 10px;
+          width: 10px;
+          background-color: rgb(206, 8, 8);
+          border-radius: 50%;
+
+        }
       }
-      
+     
     }
+     .top:hover{
+        .light{
+          .btn{
+            display:block;
+          }
+        }
+      }
     // 播放器控件
     .bottom{
-      z-index: 9999 !important;
+      z-index: 1500 !important;
       display: flex;
       justify-content: space-between;
       height: 60px;

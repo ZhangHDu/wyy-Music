@@ -7,14 +7,17 @@
       <div class="left">
         <aside>
           <!-- 用户头像以及名称 -->
-          <div class="user" @click.stop="showLogin">
+          <div class="user" >
             <!-- 未登录时 -->
             <img src="../assets/images/用户名.png" alt="" v-if='!cookie'>
             <!-- 登录后用户头像 -->
-            <img :src="this.avatarUrl" alt="" v-if="cookie">
+            <router-link to="user">
+              <img :src="this.avatarUrl" alt="" v-if="cookie">
+            </router-link>
+            
             <!-- 用户昵称 -->
-            <div class="name">{{username}}</div>
-            <div class="more">
+            <div class="name" @click.stop="showLogin">{{username}}</div>
+            <div class="more" @click.stop="showLogin">
               <img src="../assets/images/右三角形.png" alt="">
             </div>
           </div>
@@ -90,6 +93,7 @@ import top from '../components/top'
 import login from '../components/login'
 import userCard from '../components/userCard'
 import {mapState} from 'vuex'
+
 export default {
   name: 'Home',
   data(){
@@ -143,11 +147,13 @@ export default {
         console.log('个人中心');
       }
      
-    }
+    },
+    
   },
   created(){
   //  api.Search('周深').then(res=>{console.log(res.data);});
     this.username = this.name
+    
   },
   components:{
     player,

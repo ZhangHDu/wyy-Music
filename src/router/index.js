@@ -55,6 +55,12 @@ const routes = [
         path:"/station",
         name:"station",
         component:()=>import(/* webpackChunkName: "nucleic" */ '../views/all/Discover/station'),
+      },
+      {
+        // 个人中心
+        path:"/user",
+        name:"user",
+        component:()=>import(/* webpackChunkName: "nucleic" */ '../views/all/user/user'),
       }
     ]
   },
