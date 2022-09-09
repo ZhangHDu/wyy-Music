@@ -607,7 +607,7 @@ export default {
       },
       // 控制唱片旋转
       long(){
-        // this.blackStyle = "transform: rotate("+(this.$refs.audio.currentTime/this.$refs.audio.duration)*1500+"deg);"
+        this.blackStyle = "transform: rotate("+(this.$refs.audio.currentTime/this.$refs.audio.duration)*1500+"deg);"
         // console.log(this.$refs.audio.currentTime);
       },
     }

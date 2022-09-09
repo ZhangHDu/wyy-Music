@@ -68,7 +68,7 @@ export default {
            user:{
                name:null,
                avatarUrl:null,
-               cookie:null
+               cookie:null,
            }
         }
     },
@@ -156,7 +156,8 @@ export default {
             })
             },3000)
             
-        }
+        },
+        
     },
     watch:{
         value(){
@@ -168,7 +169,7 @@ export default {
     },
     created(){
         // 获取二维码的key
-        this.getQRKey()
+        this.getQRKey() 
     },
 }
 </script>

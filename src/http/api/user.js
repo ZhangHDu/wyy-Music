@@ -14,10 +14,23 @@ const user = {
             method: "get",
         })
     },
-    // 用户歌单
+    // 获取用户信息 , 歌单，收藏，mv, dj 数量
     getSubcount(){
         return service({
             url: "/user/subcount",
+            method: "get",
+        })
+    },
+    // 获取用户歌单
+    getPlayList(id){
+        return service({
+            url: "/user/playlist?uid="+id,
+            method: "get",
+        })
+    },
+    getLevel(){
+        return service({
+            url: '/user/level',
             method: "get",
         })
     }

@@ -6,6 +6,7 @@
 
 <style>
 html{
-  /* background-color: #000; */
+  background: url(./assets/bgimage/1.webp) repeat-y;
+  background-size: 100% 100%;
 }
 </style>

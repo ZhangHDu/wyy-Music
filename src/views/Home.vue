@@ -86,13 +86,12 @@
 </template>
 
 <script>
-// @ is an alias to /src
-// import api from '../api/index.js'
+import user from '../http/api/user'
 import player from '../components/player'
 import top from '../components/top'
 import login from '../components/login'
 import userCard from '../components/userCard'
-import {mapState} from 'vuex'
+import {mapMutations,mapState} from 'vuex'
 
 export default {
   name: 'Home',
@@ -108,11 +107,23 @@ export default {
       isShowLogin:false, // 是否显示登录页面
       isShowUser:false, // 是否显示用户信息
       username:'未登录',
-     
+      user:{
+        sex:null,
+        eventCount:null,
+        follows:null,
+        followeds:null,
+        description:null,
+        createdPlaylistCount:null,
+        subPlaylistCount:null,
+        createPlaylist:[],
+        subPlaylist:[],
+        levelData:{}
+      }
       
     }
   },
   methods:{
+    ...mapMutations(['getUserDetails']),
     toDiscover(){
       this.all.isInDiscover = true
       this.all.isInVideo = false
@@ -148,12 +159,63 @@ export default {
       }
      
     },
-    
+    // 获取账号信息
+        async getAccount(){
+            const account = await user.getAccount()
+           
+            // 根据account中的uid获取用户详情
+            this.getUser(account.account.id) 
+            // 获取歌单
+            this.getPlayList(account.account.id)
+        },
+        // 获取用户详情
+        async getUser(id){
+            const details = await user.getUser(id)
+            // 获取性别
+            this.user.sex = details.profile.gender
+            // 动态
+            this.user.eventCount = details.profile.eventCount
+            // 关注
+            this.user.follows = details.profile.follows
+            // 粉丝
+            this.user.followeds = details.profile.followeds
+            // 个人介绍
+            this.user.description = details.profile.description
+        },
+         // 获取用户信息 , 歌单，收藏，mv, dj 数量
+        async getUserNums(){
+            const {createdPlaylistCount,subPlaylistCount} = await user.getSubcount()
+            this.user.createdPlaylistCount = createdPlaylistCount
+            this.user.subPlaylistCount = subPlaylistCount
+        },
+        // 获取用户歌单
+        async getPlayList(id){
+            const res = await user.getPlayList(id)
+            const allList = res.playlist
+            // 根据创建歌单数量对总歌单切割获取用户创建的歌单
+            this.user.createPlaylist = allList.slice(0,this.user.createdPlaylistCount)
+            // 剩下的就是用户收藏的歌单
+            this.user.subPlaylist = allList.slice(this.user.createdPlaylistCount,allList.length)
+            
+        },
+        async getLevel(){
+          const res = await user.getLevel()
+          this.user.levelData = res.data
+        }
   },
   created(){
-  //  api.Search('周深').then(res=>{console.log(res.data);});
     this.username = this.name
-    
+     
+    if(this.cookie){
+      // 获取账号信息
+      this.getAccount()
+      // 获取用户信息 , 歌单，收藏，mv, dj 数量
+      this.getUserNums()
+      // 获取等级
+      this.getLevel()
+      // 将整理好的用户信息通过vuex管理
+      this.getUserDetails(this.user)
+    }
   },
   components:{
     player,

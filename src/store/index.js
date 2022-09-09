@@ -9,7 +9,8 @@ const store = new vuex.Store({
             cookie:"",
             playList:[], //播放歌单
             nowplay:{}, //当前播放
-            topStyle:false
+            topStyle:false, //顶部样式控制
+            user:{} // 用户信息
     },
     mutations:{
         // 更新用户名
@@ -29,6 +30,9 @@ const store = new vuex.Store({
             return state.name = name,
                     state.url = url,
                     state.cookie = cookie
+        },
+        getUserDetails(state,user){
+          return state.user = user
         },
         // 添加播放列表里的歌曲
         changePlayList(state,obj){
