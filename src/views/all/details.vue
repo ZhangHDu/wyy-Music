@@ -261,6 +261,7 @@ export default {
                 this.isChange = true
             }
             const res = await detail.getDetails(id)
+            console.log(res);
             const {coverImgUrl,name,createTime,commentCount,creator,tags,description,trackCount,playCount,userId,subscribedCount,shareCount} = res.playlist
             // 获取歌单封面
             this.details.coverImgUrl = coverImgUrl
@@ -390,6 +391,7 @@ export default {
         musicDetail(){
             this.details.songs.forEach(async(item)=>{
                 const res = await music.getMusicUrl(item.id)
+                console.log(item);
                 const obj = {
                     id:item.id, // 歌曲id
                     name:item.name, // 歌名

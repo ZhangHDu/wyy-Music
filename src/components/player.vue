@@ -223,7 +223,8 @@
         </div>
         <!-- 上一首 -->
         <div class="pre" @click="prePlay">
-           <img src="../assets/images/上一首.png" alt="">
+           <img src="../assets/images/上一首.png" alt=""  v-show="type === 0">
+           <img src="../assets/images/上一首2.png" alt=""  v-show="type === 1">
         </div>
         <!-- 播放暂停键 -->
         <div class="play" @click="isPlay">
@@ -237,11 +238,11 @@
       </div>
       <div class="right">
         <!-- 播放模式 -->
-        <div class="circle">
+        <div class="circle" v-show="type === 0">
           <img src="../assets/images/循环.png" alt="">
         </div>
         <!-- 播放列表 -->
-        <div class="menu" @click="showList">
+        <div class="menu" @click="showList"  v-show="type === 0">
            <img src="../assets/images/歌单.png" alt="">
         </div>
         <!-- 音量 -->
@@ -280,13 +281,14 @@ export default {
             total:0, // 评论数
             lyric:null, // 原生歌词
             lrcArr:[], // 处理完成的原生歌词
+           
         }
     },
     components:{
       comments
     },
     methods:{
-        ...mapMutations(['clearPlayList','changeIsNowPlay','changeNowPlay','changePlayList','changeTopStyle']),
+        ...mapMutations(['clearPlayList','changeIsNowPlay','changeNowPlay','changePlayList','changeTopStyle','isNext']),
         // 是否播放
         isPlay(){
             if(this.playData.url){
@@ -361,40 +363,51 @@ export default {
         },
         // 上一首
         prePlay(){
-          // 获取正在播放歌曲的index
-          let a = this.playList.findIndex((item)=>{
-            return item.id === this.nowplay.id
-          })
-          if(a === 0){
-            // 如果当前播放是第一首的话，点击上一首跳至最后一首
-            this.changeNowPlay(this.playList[this.playList.length-1])
-          }else{
-            // 否则播放上一首歌曲
-            this.changeNowPlay(this.playList[a-1])
+          if(this.type === 0){
+              // 获取正在播放歌曲的index
+            let a = this.playList.findIndex((item)=>{
+              return item.id === this.nowplay.id
+            })
+            if(a === 0){
+              // 如果当前播放是第一首的话，点击上一首跳至最后一首
+              this.changeNowPlay(this.playList[this.playList.length-1])
+            }else{
+              // 否则播放上一首歌曲
+              this.changeNowPlay(this.playList[a-1])
+            }
           }
         },
         // 下一首
         nextPlay(){
-          // 获取正在播放歌曲的index
-          let a = this.playList.findIndex((item)=>{
-            return item.id === this.nowplay.id
-          })
-          if(a === this.playList.length -1){
-            // 如果播放的是最后一首的话，点击下一首切换至第一首
-            this.changeNowPlay(this.playList[0])
+          if(this.type ===0){
+              // 获取正在播放歌曲的index
+            let a = this.playList.findIndex((item)=>{
+              return item.id === this.nowplay.id
+            })
+            if(a === this.playList.length -1){
+              // 如果播放的是最后一首的话，点击下一首切换至第一首
+              this.changeNowPlay(this.playList[0])
+            }else{
+              // 否则播放下一首
+              this.changeNowPlay(this.playList[a+1])
+            }
+            if(this.nowplay === {}){
+              this.$refs.audio.pause() // 暂停
+              this.playData = {}
+            }
           }else{
-            // 否则播放下一首
-            this.changeNowPlay(this.playList[a+1])
-          }
-          if(this.nowplay === {}){
-            this.$refs.audio.pause() // 暂停
-            this.playData = {}
+            this.isNext()
           }
         },
         // 是否显示歌词页面
         showSongDetail(){
-          this.showDetail = !this.showDetail
-          this.changeTopStyle(this.showDetail)
+          if(this.type === 0){
+            this.showDetail = !this.showDetail
+            this.changeTopStyle(this.showDetail)
+          }else{
+            this.$router.push('/FM')
+          }
+         
           
         },
         // 获取相关音乐
@@ -533,7 +546,7 @@ export default {
           this.playData = this.nowplay
     },
     computed:{
-      ...mapState(['playList','nowplay']),
+      ...mapState(['playList','nowplay','type']),
     },
     watch:{
       nowplay(){
@@ -805,11 +818,13 @@ export default {
               align-items: center;
               img:first-child{
                 width: 330px;
+                height: 330px;
                 position: absolute;
                 z-index: 10;
               }
               img:nth-child(2){
                 width: 220px;
+                height: 220px;
                 transform-origin: 110px 110px;
                 transition: transform 1s linear;
               }
@@ -1125,6 +1140,12 @@ export default {
           margin: 0 20px;
           img{
             width: 45px;
+          }
+        }
+        .delete{
+          margin-left: 50px;
+          img{
+            width: 20px;
           }
         }
       }

@@ -130,7 +130,7 @@ export default {
         isplay
     },
     methods:{
-        ...mapMutations(['changePlayList','changeNowPlay']),
+        ...mapMutations(['changePlayList','changeNowPlay','changeType']),
         // 获取轮播图
         async getBanner(){
             const res = await home.getBanners()
@@ -179,6 +179,7 @@ export default {
         
         // 双击歌曲播放
         async getSongMsg(a){
+            this.changeType(0)
             // 获取双击歌曲的数据
             const res = await music.getMusicUrl(a.song.id)
             // 添加到vuex中
@@ -206,7 +207,7 @@ export default {
                 isNowPlay:true, // 是否立即播放
                 runTime:0, // 播放进度
                 switchTime:"00:00", // 转换后的时间
-                for:'发现页'
+                for:'发现页',
             }
             // 添加到歌单列表中
             this.changePlayList(newMusic)

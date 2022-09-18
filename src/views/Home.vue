@@ -5,9 +5,10 @@
      <!-- 内容区 -->
     <div class="main"> 
       <div class="left">
+        <!-- 侧边栏 -->
         <aside>
           <!-- 用户头像以及名称 -->
-          <div class="user" >
+          <div class="user" @click="showLogin">
             <!-- 未登录时 -->
             <img src="../assets/images/用户名.png" alt="" v-if='!cookie'>
             <!-- 登录后用户头像 -->
@@ -21,51 +22,127 @@
               <img src="../assets/images/右三角形.png" alt="">
             </div>
           </div>
+          <!-- 发现音乐 fm 视频 朋友 -->
           <div class="all">
             <router-link to="/Discover-music">
-              <div class="all1 active" @click="toDiscover" v-show="all.isInDiscover">
+              <div class="all1 active" v-show="all.isInDiscover">
                 <img src="../assets/images/音乐2.png" alt="">
               发现音乐
               </div>
-              <div class="all1" @click="toDiscover" v-show="!all.isInDiscover">
+              <div class="all1" v-show="!all.isInDiscover">
                 <img src="../assets/images/音乐.png" alt="">
               发现音乐
               </div>
             </router-link>
             <router-link to="/FM" >
-              <div class="all2 active" @click="toFM" v-show="all.isInFM">
-               <img src="../assets/images/电台2.png" alt="">
+              <div class="all2 active" v-show="all.isInFM">
+               <img src="../assets/images/声波2.png" alt="">
               私人FM
               </div>
-              <div class="all2" @click="toFM" v-show="!all.isInFM">
-               <img src="../assets/images/电台.png" alt="">
+              <div class="all2" v-show="!all.isInFM">
+               <img src="../assets/images/声波.png" alt="">
               私人FM
               </div>
             </router-link>
             <router-link to="/video">
-              <div class="all3 active" @click="toVideo" v-show="all.isInVideo">
+              <div class="all3 active" v-show="all.isInVideo">
                 <img src="../assets/images/视频2.png" alt="">
               视频
               </div>
-              <div class="all3" @click="toVideo" v-show="!all.isInVideo">
+              <div class="all3" v-show="!all.isInVideo">
                 <img src="../assets/images/视频.png" alt="">
               视频
               </div>
             </router-link>
             <router-link to="/friend">
-              <div class="all4 active" @click='toFriend' v-show="all.isInFriend">
+              <div class="all4 active"  v-show="all.isInFriend">
                <img src="../assets/images/friend2.png" alt="">
               朋友
               </div>
-               <div class="all4" @click='toFriend' v-show="!all.isInFriend">
+               <div class="all4" v-show="!all.isInFriend">
                <img src="../assets/images/friend.png" alt="">
               朋友
               </div>
             </router-link>
             
           </div>
-          <div class="myMusic"></div>
-          <div class="myList"></div>
+          <!-- 我的音乐 -->
+          <div class="myMusic">
+            <div class="mMtitle">我的音乐</div>
+            <ul>
+              <li>
+                <img src="../assets/images/音乐3.png" alt="">
+                iTunes音乐
+              </li>
+              <li>
+                <img src="../assets/images/下载1.png" alt="">
+                下载管理
+              </li>
+              <li>
+                <img src="../assets/images/最近常用.png" alt="">
+                最近播放
+              </li>
+              <li>
+                <img src="../assets/images/云.png" alt="">
+                我的音乐云盘
+              </li>
+              <li>
+                <img src="../assets/images/电台.png" alt="">
+                我的电台
+              </li>
+              <li>
+                <img src="../assets/images/收藏1.png" alt="">
+                我的收藏
+              </li>
+            </ul>
+          </div>
+          <!-- 我的歌单 -->
+          <div class="myList">
+            <div class="createList">
+              <div class="cLtitle" @click="openList(true)">
+                <div class="cLleft">
+                  <div class="cLicon">
+                    <img src="../assets/images/右三角形.png" alt="" v-show="!openCreateList">
+                    <img src="../assets/images/下三角.png" alt="" v-show="openCreateList">
+                  </div>
+                  <div class="cLname">创建的歌单</div>
+                </div>
+                <div class="cLright">
+                  <img src="../assets/images/添加1.png" alt="" @click.stop="createList">
+                </div>
+              </div>
+              <ul v-show="openCreateList">
+                <li v-for="item in user.createPlaylist" :key="item.id" @click="toPlayList(item.id)"> 
+                     <img class="liIcon" src="../assets/images/歌单1.png" alt="" v-if="!item.isFirst">
+                  <img class="liIcon" src="../assets/images/Love.png" alt="" v-else>
+                  <div class="liname">
+                    {{item.name}}
+                  </div>
+                  <img  src="../assets/images/心跳.png" alt="" v-if="item.isFirst">
+                </li>
+              </ul>
+            </div>
+            <div class="strList">
+              <div class="sLtitle" @click="openList(false)">
+                <div class="sLleft">
+                  <div class="sLicon">
+                    <img src="../assets/images/右三角形.png" alt="" v-show="!openStrList">
+                    <img src="../assets/images/下三角.png" alt="" v-show="openStrList">
+                  </div>
+                  <div class="sLname">收藏的歌单</div>
+                </div>
+              </div>
+              <ul v-show="openStrList">
+                <li v-for="item in user.subPlaylist" :key="item.id" @click="toPlayList(item.id)">
+                  <img class="liIcon" src="../assets/images/歌单1.png" alt="">
+                 
+                  <div class="liname">
+                    {{item.name}}
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
         </aside>
       </div>
       <div class="right">
@@ -106,6 +183,8 @@ export default {
       },
       isShowLogin:false, // 是否显示登录页面
       isShowUser:false, // 是否显示用户信息
+      openCreateList:false,// 是否展开创建的歌单
+      openStrList:false,// 是否展开收藏的歌单
       username:'未登录',
       user:{
         sex:null,
@@ -113,6 +192,8 @@ export default {
         follows:null,
         followeds:null,
         description:null,
+        name:'未登录',
+        avatar:null,
         createdPlaylistCount:null,
         subPlaylistCount:null,
         createPlaylist:[],
@@ -123,31 +204,7 @@ export default {
     }
   },
   methods:{
-    ...mapMutations(['getUserDetails']),
-    toDiscover(){
-      this.all.isInDiscover = true
-      this.all.isInVideo = false
-      this.all.isInFriend = false
-      this.all.isInFM = false
-    },
-    toFM(){
-      this.all.isInDiscover = false
-      this.all.isInVideo = false
-      this.all.isInFriend = false
-      this.all.isInFM = true
-    },
-    toVideo(){
-      this.all.isInDiscover = false
-      this.all.isInVideo = true
-      this.all.isInFriend = false
-      this.all.isInFM = false
-    },
-    toFriend(){
-      this.all.isInDiscover = false
-      this.all.isInVideo = false
-      this.all.isInFriend = true
-      this.all.isInFM = false
-    },
+    ...mapMutations(['getUserDetails','getName','getAvatarUrl']),
     showLogin(){
       // 如果未登录，就改为true，显示登录界面。如果登录了点击进入个人页面
       if(!this.cookie){
@@ -162,7 +219,6 @@ export default {
     // 获取账号信息
         async getAccount(){
             const account = await user.getAccount()
-           
             // 根据account中的uid获取用户详情
             this.getUser(account.account.id) 
             // 获取歌单
@@ -194,18 +250,63 @@ export default {
             const allList = res.playlist
             // 根据创建歌单数量对总歌单切割获取用户创建的歌单
             this.user.createPlaylist = allList.slice(0,this.user.createdPlaylistCount)
+            this.user.createPlaylist[0].isFirst = true
             // 剩下的就是用户收藏的歌单
-            this.user.subPlaylist = allList.slice(this.user.createdPlaylistCount,allList.length)
-            
+            this.user.subPlaylist = allList.slice(this.user.createdPlaylistCount,allList.length)  
         },
+        // 获取等级信息
         async getLevel(){
           const res = await user.getLevel()
           this.user.levelData = res.data
+        },
+        // 判断路由位置控制样式
+        routeChange(){
+          if(this.$route.path == '/FM'){
+            this.all.isInFM = true
+          }else{
+            this.all.isInFM = false
+          }
+          if(this.$route.path == '/Discover-music'){
+            this.all.isInDiscover = true
+          }else{
+            this.all.isInDiscover = false
+          }
+          if(this.$route.path == '/video'){
+            this.all.isInVideo = true
+          }else{
+            this.all.isInVideo = false
+          }
+          if(this.$route.path == '/friend'){
+            this.all.isInFriend = true
+          }else{
+            this.all.isInFriend = false
+          }
+        },
+        // 跳转歌单详情
+        toPlayList(id){
+          this.$router.push({ path: '/details', query: { id: id } })
+        },
+        // 展开歌单
+        openList(a){
+          if(a){
+            this.openCreateList = !this.openCreateList
+          }else{
+            this.openStrList = !this.openStrList
+          }
+        },
+        // 创建歌单
+        createList(){
+          
+        },
+        // 创建时路由位置
+        createdRoute(){
+          if(this.$route.path!== '/Discover-music'){
+            this.$router.push('/Discover-music')
+          }
         }
   },
   created(){
     this.username = this.name
-     
     if(this.cookie){
       // 获取账号信息
       this.getAccount()
@@ -216,6 +317,7 @@ export default {
       // 将整理好的用户信息通过vuex管理
       this.getUserDetails(this.user)
     }
+    this.createdRoute()
   },
   components:{
     player,
@@ -225,6 +327,11 @@ export default {
   },
   computed:{
     ...mapState(['name','cookie','avatarUrl'])
+  },
+  watch:{
+    $route(){
+      this.routeChange()
+    }
   },
   updated(){
    this.username = this.name
@@ -249,6 +356,9 @@ export default {
         width: 196px;
         background: #eaeaea;
         aside{
+          width: 100%;
+          height: 547px;
+          overflow-y: scroll;
           .user{
             display: flex;
             align-items: center;
@@ -257,7 +367,7 @@ export default {
             img{
               width: 40px;
               border-radius: 50%;
-              margin: 10px;
+              margin: 5px;
             }
             .name{
               width: 100px;
@@ -277,8 +387,8 @@ export default {
           }
           .all{
             width: 196px;
-            font-size: 14px;
-            color: #8a8a8a;
+            font-size: 13px;
+            
             .active{
               color: #d81e06;
               background: #dadada;
@@ -286,17 +396,136 @@ export default {
             div{
               display: flex;
               align-items: center;
-              padding: 10px 0 10px 20px;
+              padding: 8px 0 8px 20px;
             }
             div:hover{
               background-color: #dadada;
             }
             a{
-               color: #8a8a8a;
+               color: #2c2c2c;
             }
             img{
               width: 20px;
               margin-right: 10px;
+            }
+            
+          }
+          .myMusic{
+            .mMtitle{
+              padding: 10px 20px;
+              font-size: 13px;
+              color: #8a8a8a;
+            }
+            ul{
+              li{
+                display: flex;
+                align-items: center;
+                font-size: 13px;
+                color: #2c2c2c;
+                padding: 8px 0 8px 20px;
+                img{
+                  width: 18px;
+                  height: 18px;
+                  padding-right: 10px;
+                }
+              }
+            }
+          }
+          .myList{
+            padding-top: 20px;
+            .createList{
+              margin-bottom: 20px;
+              .cLtitle{
+                  color: #8a8a8a;
+                  font-size:13px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  .cLleft{
+                    display: flex;
+                    align-items: center;
+                    .cLicon{
+                      img{
+                        width: 10px;
+                        padding: 0 5px;
+                      }
+                    } 
+                  }
+                  .cLright{
+                    margin-right: 15px;
+                    display: flex;
+                    align-items: center;
+                    img{
+                      width: 13px;
+                    }
+                  }
+              }
+              ul{
+                li{
+                  display: flex;
+                  align-items: center;
+                  font-size: 13px;
+                  color: #2c2c2c;
+                  
+                  padding: 7px 20px 7px 0;
+                  .liIcon{
+                    width: 15px;
+                    padding: 0 10px 0 20px;
+                  }
+                  img{
+                    width:18px;
+                  }
+                  .liname{
+                    white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  }
+                }
+                li:hover{
+                  background-color: #dadada;
+                }
+              }
+            }
+            .strList{
+              .sLtitle{
+                  color: #8a8a8a;
+                  font-size:13px;
+                  .sLleft{
+                    display: flex;
+                    align-items: center;
+                    .sLicon{
+                      img{
+                        width: 10px;
+                        padding: 0 5px;
+                      }
+                    } 
+                  }
+              }
+              ul{
+                li{
+                  display: flex;
+                  align-items: center;
+                  font-size: 13px;
+                  color: #2c2c2c;
+                  
+                  padding: 7px 20px 7px 0;
+                  .liIcon{
+                    width: 15px;
+                    padding: 0 10px 0 20px;
+                  }
+                  img{
+                    width:18px;
+                  }
+                  .liname{
+                    white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  }
+                }
+                li:hover{
+                  background-color: #dadada;
+                }
+              }
             }
           }
         }

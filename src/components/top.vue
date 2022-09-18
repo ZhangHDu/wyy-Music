@@ -15,8 +15,8 @@
             </div>
           </div>
         </div>
-        <div class="title">
-          <div class="aside">
+        <div class="title" >
+          <div class="aside" v-if="routePath === '/Discover-music'">
             <router-link to="/Discover-music">
               <div class="recommend">个性推荐</div>
             </router-link>
@@ -30,6 +30,11 @@
             <div class="singer">歌手</div>
             <div class="news">最新音乐</div>
           </div>
+          <div class="aside" v-if="routePath === '/video'">
+            <div class="video">视频</div>
+            <div class="mv">MV</div>
+          </div>
+          <div class="aside" v-else></div>
           <div class="base">
             <div class="search">
               <input type="text" value="孤勇者" :style="changeStyle">
@@ -68,7 +73,8 @@ export default {
     data(){
       return{
         changeStyle:'background: rgb(221, 109, 94);color:rgba(255, 255, 255, 0.742);', //搜索框样式
-        setStyle:''
+        setStyle:'',
+        routePath:'/Discover-music'
       }
     },
     props:['all'],
@@ -94,6 +100,15 @@ export default {
         }else{
           // 红色
           this.changeStyle = "background: rgb(221, 109, 94);color: rgba(255, 255, 255, 0.742);"
+        }
+      },
+      $route(){
+        if(this.$route.path == '/Discover-music'){
+          this.routePath = '/Discover-music'
+        }else if(this.$route.path == '/video'){
+          this.routePath = '/video'
+        }else{
+          this.routePath = 'none'
         }
       }
     },

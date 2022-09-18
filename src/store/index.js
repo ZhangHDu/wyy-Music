@@ -8,9 +8,12 @@ const store = new vuex.Store({
             avatarUrl:"",//头像
             cookie:"",
             playList:[], //播放歌单
+            fmPlayList:[], //fm播放歌单
             nowplay:{}, //当前播放
             topStyle:false, //顶部样式控制
-            user:{} // 用户信息
+            user:{}, // 用户信息
+            type:0, //区分正常播放和fm播放
+            next:false,
     },
     mutations:{
         // 更新用户名
@@ -49,8 +52,6 @@ const store = new vuex.Store({
         },
         // 更改当前播放歌曲信息
         changeNowPlay(state,obj){
-          // 重置播放时间
-          // obj.switchTime = '00:00'
           state.nowplay = obj
         },
         // 清空播放列表
@@ -76,8 +77,16 @@ const store = new vuex.Store({
         addPlayList(state,obj){
           state.playList = [...state.playList,...obj]
         },
+        // 改变顶部组件样式
         changeTopStyle(state,a){
           return state.topStyle = a
+        },
+        // 改变播放类型
+        changeType(state,a){
+          return state.type = a
+        },
+        isNext(state){
+          return state.next = !state.next
         }
     },
     plugins: [

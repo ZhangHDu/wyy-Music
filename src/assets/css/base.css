@@ -15,6 +15,9 @@ img{
 div::-webkit-scrollbar{
     display:none
 }
+aside::-webkit-scrollbar{
+    display:none
+}
 html{
     overflow-x: hidden !important;
 }
