@@ -173,7 +173,6 @@ export default {
         },
         // 点击歌单前往歌单详情
         toDetails(id){
-            console.log(id);    
             this.$router.push({ path: '/details', query: { id: id } })
         },
         
@@ -253,7 +252,6 @@ export default {
 .Discover-music{
     height: 610px;
     overflow-y: scroll;
-    overflow-x: scroll;
     width: 804px;
     // 轮播图
     .swiper{

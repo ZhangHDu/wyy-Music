@@ -261,7 +261,6 @@ export default {
                 this.isChange = true
             }
             const res = await detail.getDetails(id)
-            console.log(res);
             const {coverImgUrl,name,createTime,commentCount,creator,tags,description,trackCount,playCount,userId,subscribedCount,shareCount} = res.playlist
             // 获取歌单封面
             this.details.coverImgUrl = coverImgUrl

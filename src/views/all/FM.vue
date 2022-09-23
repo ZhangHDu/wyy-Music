@@ -260,7 +260,7 @@ export default {
       this.nextFM()
     },
     $route(){
-        if(this.$route.path === '/FM'||this.type === 0){
+        if(this.$route.path === '/FM'&&this.type === 0){
             this.preUrl = null
             this.changeType(1)
             this.getFM()

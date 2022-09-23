@@ -267,7 +267,7 @@ export default {
             is_play:false, // 是否播放
             // 在播放音乐的属性
             playData:{},
-            isShowList:false,
+            isShowList:false, // 是否显示播放列表
             timer:null, // 是否清除定时器
             long:"width:0%", // 进度条百分比
             showDetail:false, // 显示歌曲详情
@@ -549,6 +549,9 @@ export default {
       ...mapState(['playList','nowplay','type']),
     },
     watch:{
+      $route(){
+        this.isShowList = false
+      },
       nowplay(){
         if(this.nowplay){
           this.is_play = false
