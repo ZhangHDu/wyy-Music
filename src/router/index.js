@@ -30,7 +30,7 @@ const routes = [
         // 视频
         path:"/video",
         name:"video",
-        component:()=>import(/* webpackChunkName: "nucleic" */ '../views/all/video.vue')
+        component:()=>import(/* webpackChunkName: "nucleic" */ '../views/all/video/video.vue')
       },
       {
         // 朋友
@@ -61,9 +61,16 @@ const routes = [
         path:"/user",
         name:"user",
         component:()=>import(/* webpackChunkName: "nucleic" */ '../views/all/user/user'),
+      },
+      {
+        // 视频详情
+        path:'/videoDetail',
+        name:'videoDetail',
+        component:()=>import(/* webpackChunkName: "nucleic" */ '../views/all/video/videoDetail')
       }
     ]
   },
+  
   
 ]
 

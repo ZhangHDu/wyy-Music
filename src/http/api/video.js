@@ -27,6 +27,34 @@ const video = {
                 url:"/video/group?id="+id,
                 method:"get"
             })
+    },
+    // 获取视频详情
+    getVideoDetail(id){
+        return service({
+            url:"/video/detail?id="+id,
+            method:"get"
+        })
+    },
+    // 获取视频url
+    getVideoUrl(id){
+        return service({
+            url:"/video/url?id="+id,
+            method:"get"
+        })
+    },
+    // 获取视频评论
+    getVideoComments(id){
+        return service({
+            url:"/comment/video?id="+id,
+            method:"get"
+        })
+    },
+    // 获取相关视频
+    getRelated(id){
+        return service({
+            url:"/related/allvideo?id="+id,
+            method:"get"
+        })
     }
 }
 export default video

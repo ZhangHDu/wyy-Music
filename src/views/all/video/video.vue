@@ -2,7 +2,7 @@
   <div class="video" ref="video">
     <!-- 头部标签 -->
       <div class="head">
-        <div class="category" @click="showAll">{{thisTab}}<img src="../../assets/images/video/展开.png" alt=""></div>
+        <div class="category" @click="showAll">{{thisTab}}<img src="../../../assets/images/video/展开.png" alt=""></div>
         <div class="list">
           <div class='tab' v-for="item in list" :key="item.id" @click="getcateId(item.id,item.name)">
             <div class="noactive" v-show="!item.selectTab">{{item.name}}</div>
@@ -12,11 +12,11 @@
       </div>
       <!-- 视频 -->
       <div class="videos" v-if="!inMv">
-        <div class="item" v-for="item in videos" :key="item.index" @click="toVideoDetail">
+        <div class="item" v-for="item in videos" :key="item.index" @click="toVideoDetail(item.vid)">
             <div class="img">
               <img :src="item.coverUrl" alt="">
               <div class="nums">
-                <img src="../../assets/images/播放4.png" alt="">
+                <img src="../../../assets/images/播放4.png" alt="">
                 {{item.nums}}
               </div>
               <div class="time">{{item.time}}</div>
@@ -35,7 +35,7 @@
           <div class="img">
             <img :src="item.coverUrl" alt="">
               <div class="nums">
-                <img src="../../assets/images/播放4.png" alt="">
+                <img src="../../../assets/images/播放4.png" alt="">
                 {{item.nums}}
               </div>
               <div class="time">{{item.time}}</div>
@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import video from '../../http/api/video.js'
+import video from '../../../http/api/video.js'
 export default {
   data(){
     return{
@@ -189,8 +189,8 @@ export default {
       console.log('前往用户详情');
     },
     // 前往视频详情页
-    toVideoDetail(){
-      console.log('前往视频详情');
+    toVideoDetail(id){
+      this.$router.push({ path: '/videoDetail', query: { id: id } })
     }
   },
   created(){
@@ -250,8 +250,11 @@ export default {
         } 
       })
       // 数量不够一页获取多一页的数据
-      if(this.videos.length<9){
+      if(this.videos.length<9 && this.type !==0){
         this.getCateVideo(this.type)
+      }else if(this.videos.length<9 && this.type ===0){
+        this.page +=1
+        this.getAllVideo(this.page)
       }
     },
     mvs(){
@@ -364,7 +367,7 @@ export default {
             color: #d1d1d1;
           }
           .by:hover{
-            color: #d1d1d1;
+            color: rgb(186, 186, 186);
           }
         }
       }
