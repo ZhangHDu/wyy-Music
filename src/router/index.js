@@ -2,6 +2,11 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 
+const routerRePush = VueRouter.prototype.push
+VueRouter.prototype.push = function (location) {
+  return routerRePush.call(this, location).catch(error => error)
+}
+
 Vue.use(VueRouter)
 
 const routes = [
@@ -67,6 +72,12 @@ const routes = [
         path:'/videoDetail',
         name:'videoDetail',
         component:()=>import(/* webpackChunkName: "nucleic" */ '../views/all/video/videoDetail')
+      },
+      {
+        // 搜索结果页
+        path:'/search',
+        name:'search',
+        component:()=>import(/* webpackChunkName: "nucleic" */ '../views/all/search/search')
       }
     ]
   },

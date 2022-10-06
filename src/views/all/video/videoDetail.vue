@@ -80,6 +80,7 @@ export default {
       // 获取视频详情
       async getDetail(id){
         const res = await video.getVideoDetail(id)
+        console.log(res);
         this.detail = res.data
       },
       // 获取视频路径
@@ -163,7 +164,7 @@ export default {
   overflow-y:scroll;
   display: flex;
   .left{
-    width: 445px;
+    width: 65%;
     .back{
       display:flex;
       align-items:center;
@@ -177,8 +178,8 @@ export default {
     }
     .video{     
       video{
-        width: 445px;
-        height: 250px;
+        width: 100%;
+        height: 350px;
         border-radius: 7px;
       }
     }
@@ -274,7 +275,7 @@ export default {
     }
   }
   .right{
-    width: 299px;
+    width: 35%;
     padding-left:20px;
     .otherVideo{
       padding-bottom:10px;

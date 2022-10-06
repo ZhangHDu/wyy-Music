@@ -43,7 +43,7 @@
             <!-- 搜索 -->
             <div class="search">
               <img src="../assets/images/top/搜索.png" alt="" :style="changeStyle">
-              <input type="text" placeholder="搜索" :style="changeStyle" @focus="showList" @blur="unshowList">
+              <input v-model="value" type="text" :style="changeStyle" @input="suggestSearch" @keyup.13="search"  @focus="showList" @blur="unshowList">
             </div>
             <!-- 设置 -->
             <div class="set" v-if="!topStyle">
@@ -73,27 +73,26 @@
         </div>
         <!-- 点击搜索框展示更多内容 -->
         <div class="searchList" v-show="show">
-          <div class="history">
+          <!-- 搜索历史 -->
+          <div class="history" v-show="history.length!==0 && !isSearch">
             <div class="historyTitle">
               <div class="hTLeft">
                 搜索历史
-                <img src="../assets/images/top/删除.png" alt="">
+                <img src="../assets/images/top/删除.png" alt="" @click="clearHis">
               </div>
               <div class="hTRight">
                 查看全部
               </div>
             </div>
-            <div class="historyList">
-              <div class="old">陈奕迅</div>
-              <div class="old">周杰伦</div>
-              <div class="old">张学友</div>
-              <div class="old">谭咏麟</div>
+            <div class="historyList" >
+              <div class="old" v-for="item in history" :key="item.index" @click="goValue(item)">{{item}}</div>
             </div>
           </div>
-          <div class="hot">
+          <div class="hot" v-show="!isSearch">
             <div class="hotListTitle">
               热搜榜
             </div>
+            <!-- 热搜列表 -->
             <div class="hotList">
               <div class="hotItem" v-for="(item,index) in hotList" :key="index">
                 <div class="index" style="color:#f73218;" v-if="index<=2">{{index + 1}}</div>
@@ -109,6 +108,56 @@
               </div>
             </div>
           </div>
+          <!-- 搜索建议 -->
+          <div class="isSearch" v-if="isSearch">
+            <div class="searchTitle" @click="toValue">搜“<div class='value'>{{value}}</div>”相关的结果&gt;</div>
+            <!-- 单曲 -->
+            <div class="song" v-if="suggestData.songs">
+              <div class="Title">
+                <img src="../assets/images/top/音乐.png" alt="">
+                单曲
+              </div>
+              <div class="songList">
+                <div class="item" v-for="item in suggestData.songs" :key="item.index">
+                  {{item.name}}
+                  <div class="tran" v-if="item.transNames">&nbsp;&nbsp;({{item.transNames[0]}})</div>
+                  -
+                  <div class="art" v-for="art in item.artists" :key="art.index">{{art.name}}</div>
+                </div>
+              </div>
+            </div>
+            <!-- 歌手 -->
+            <div class="singer" v-if="suggestData.artists">
+              <div class="Title">
+                <img src="../assets/images/top/用户.png" alt="">
+                歌手
+              </div>
+              <div class="singerList">
+                <div class="item" v-for="item in suggestData.artists" :key="item.index">{{item.name}}</div>
+              </div>
+            </div>
+            <!-- 专辑 -->
+            <div class="cd" v-if="suggestData.albums">
+              <div class="Title">
+                <img src="../assets/images/top/专辑.png" alt="">
+                专辑
+              </div>
+              <div class="cdList">
+                <div class="item" v-for="item in suggestData.albums" :key='item.index'>{{item.name}}</div>
+              </div>
+            </div>
+            <!-- 歌单 -->
+            <div class="playList" v-if="suggestData.playlists">
+              <div class="Title">
+                <img src="../assets/images/top/歌单.png" alt="">
+                歌单
+              </div>
+              <div class="list">
+                <div class="item" v-for="item in suggestData.playlists" :key="item.index">{{item.name}}</div>
+              </div>
+            </div>
+          </div>
+         
         </div>
   </div>
 </template>
@@ -123,13 +172,17 @@ export default {
         setStyle:'',
         routePath:'/Discover-music',
         show:false, // 是否显示搜索内容
-        history:[], // 搜索历史
+        value:'搜索',
         hotList:[], //热搜榜
+        isSearch:false,
+        suggestData:{},
+        timer:null,
+        keyword:null
       }
     },
     props:['all'],
     methods:{
-      ...mapMutations(['changeTopStyle']),
+      ...mapMutations(['changeTopStyle','addHistory','clearHistory']),
       // 上一个路由地址
       preRouter(){
         this.$router.go(-1)
@@ -143,15 +196,77 @@ export default {
         const res = await search.hotSearch()
         this.hotList = res.data
       },
+      // 聚焦事件
       showList(){
         this.show = true
+        if(this.value == '搜索'){
+          this.value = ''
+        }else if(this.value){
+          this.isSearch = true
+          this.suggestSearch()
+        }else{
+          this.isSearch = false
+        }
+        
       },
+      // 搜索建议
+      async suggestSearch(){
+        if(this.value !=='' && this.value !== '搜索'){
+          const res = await search.suggest(this.value)
+          this.suggestData = res.result
+          this.isSearch = true
+        }
+        
+      },
+      // 失焦事件
       unshowList(){
+        if(this.value===''){
+          this.value = '搜索'
+        }
+        setTimeout(()=>{
+          this.show = false
+        },100)
+      },
+      // 回车搜索
+      search(){
+        // 关闭搜索组件
         this.show = false
+        // 如果不是位于搜索结果页，直接跳转
+        if(this.$route.path !== '/search'){
+          this.$router.push({path:'/search',query:{value:this.value}})
+          this.addHistory(this.value)
+          this.keyword = this.value
+        }else{
+          // 否则替换路由
+          if(this.keyword !== this.value){
+            this.$router.replace({path:'/search',query:{value:this.value}})
+            this.addHistory(this.value)
+            this.keyword = this.value
+          }else{
+            console.log('关键词未发生变化，不进行跳转')
+          }
+         
+        }
+       
+      },
+      // 回车提交事件
+      toValue(){
+        this.search()
+      },
+      // 清空历史记录
+      clearHis(){
+        this.clearHistory()
+      },
+      // 点击搜索历史
+      goValue(a){
+        this.value = a
+        this.$router.push({path:'/search',query:{value:this.value}})
       }
     },
     created(){
+      // 改变顶部样式
        this.changeTopStyle(false)
+      //  获取热搜榜
        this.getHotSearch()
     },
     watch:{
@@ -174,10 +289,15 @@ export default {
         }else{
           this.routePath = 'none'
         }
-      }
+      },
+       value(){
+        if(this.value ==="" || this.value === '搜索'){
+          this.isSearch = false
+        }
+      },
     },
     computed:{
-      ...mapState(['topStyle'])
+      ...mapState(['topStyle','history'])
     },
 }
 </script>
@@ -392,6 +512,88 @@ export default {
                 padding-top: 10px;
                 color: #8d8d8d;
               }
+            }
+          }
+        }
+      }
+      .isSearch{
+        font-size: 12px;
+        color: #8a8a8a;
+        .searchTitle{
+          display:flex;
+          padding: 5px;
+          .value{
+            color:rgb(89, 161, 242);
+          }
+        }
+        .searchTitle:hover{
+          color: #5a5a5a;
+        }
+        .song,.singer,.cd,.playList{
+          color: #3a3a3a;
+          
+          .Title{
+            display: flex;
+            align-items: center;
+            padding: 10px 5px;
+            color: #8a8a8a;
+            img{
+              margin-right: 5px;
+              width: 16px;
+              height: 16px;
+            }
+          }
+        }
+        .singer{
+          .singerList{
+            .item{
+              width: 100%;
+              box-sizing: border-box;
+              padding:5px 20px;
+            }
+            .item:hover{
+              background:#ececec;
+            }
+          }
+        }
+        .cd{
+          .cdList{
+            .item{
+              width: 100%;
+              box-sizing: border-box;
+              padding:5px 20px;
+            }
+            .item:hover{
+              background:#ececec;
+            }
+          }
+        }
+        .playList{
+          .item{
+            width: 100%;
+              box-sizing: border-box;
+              padding:5px 20px;
+          }
+          .item:hover{
+              background:#ececec;
+            }
+        }
+        .song{
+          .songList{
+            .item{
+              width: 100%;
+              box-sizing: border-box;
+              overflow: hidden;
+              white-space: normal;
+              text-overflow: ellipsis;
+              padding:5px 20px;
+              display:flex;
+              .tran{
+                color:#8a8a8a;
+              }
+            }
+            .item:hover{
+              background:#ececec;
             }
           }
         }

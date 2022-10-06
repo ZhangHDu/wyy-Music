@@ -4,7 +4,7 @@
      <top :all="all"/>
      <!-- 内容区 -->
     <div class="main"> 
-      <div class="left">
+      <div class="left" v-show='showPlayer'>
         <!-- 侧边栏 -->
         <aside>
           <!-- 用户头像以及名称 -->
@@ -157,7 +157,7 @@
     <!-- 个人信息 -->
     <userCard v-if="isShowUser" v-model="isShowUser"/>
     <!-- 底部播放器组件 -->
-    <player />
+    <player v-show='showPlayer'/>
 
   </div>
 </template>
@@ -186,6 +186,7 @@ export default {
       openCreateList:false,// 是否展开创建的歌单
       openStrList:false,// 是否展开收藏的歌单
       username:'未登录',
+      showPlayer:true, //显示底部播放器组件
       user:{
         sex:null,
         eventCount:null,
@@ -273,8 +274,14 @@ export default {
           }
           if(this.$route.path == '/video'){
             this.all.isInVideo = true
+            
           }else{
             this.all.isInVideo = false
+          }
+          if(this.$route.path == '/videoDetail'){
+            this.showPlayer = false
+          }else{
+            this.showPlayer = true
           }
           if(this.$route.path == '/friend'){
             this.all.isInFriend = true

@@ -12,6 +12,7 @@ const store = new vuex.Store({
             nowplay:{}, //当前播放
             topStyle:false, //顶部样式控制
             user:{}, // 用户信息
+            history:[],// 历史搜索
             type:0, //区分正常播放和fm播放
             next:false,
     },
@@ -87,6 +88,12 @@ const store = new vuex.Store({
         },
         isNext(state){
           return state.next = !state.next
+        },
+        addHistory(state,a){
+          return state.history.push(a)
+        },
+        clearHistory(state){
+          return state.history = []
         }
     },
     plugins: [
