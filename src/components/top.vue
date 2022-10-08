@@ -94,7 +94,7 @@
             </div>
             <!-- 热搜列表 -->
             <div class="hotList">
-              <div class="hotItem" v-for="(item,index) in hotList" :key="index">
+              <div class="hotItem" v-for="(item,index) in hotList" :key="index" @click="toHot(item.searchWord)">
                 <div class="index" style="color:#f73218;" v-if="index<=2">{{index + 1}}</div>
                 <div class="index" v-else>{{index + 1}}</div>
                 <div class="data">
@@ -261,6 +261,11 @@ export default {
       goValue(a){
         this.value = a
         this.$router.push({path:'/search',query:{value:this.value}})
+      },
+      // 点击热搜
+      toHot(key){
+        this.value = key
+        this.search()
       }
     },
     created(){
@@ -480,17 +485,17 @@ export default {
         }
       }
       .hot{
-        padding:0 20px;
+        
         .hotListTitle{
           color: #515151;
           font-size: 15px;
-          padding:20px 0;
+          padding:20px 20px;
         }
         .hotList{
           .hotItem{
             display:flex;
             align-items: center;
-            padding: 20px 0;
+            padding: 20px 20px;
             .index{
               font-size: 16px;
               padding-right: 25px;
@@ -513,6 +518,9 @@ export default {
                 color: #8d8d8d;
               }
             }
+          }
+          .hotItem:hover{
+            background-color: rgb(245, 245, 245);
           }
         }
       }

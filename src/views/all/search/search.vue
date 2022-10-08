@@ -19,54 +19,40 @@
     <div class="tabs">
       <el-tabs  v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="单曲" name="1">
-          <el-table
-                        :data="songs"
-                        lazy
-                        stripe
-                        style="width: 100%">
-                            <!-- 序号 -->
-                            <el-table-column
-                            type='index'
-                            align="center"
-                            width="50"> 
-                            </el-table-column>
-                            <!-- 添加我喜欢 -->
-                            <el-table-column
-                            width="40">
-                            <img src="../../../assets/images/收藏 (1).png" width="20px" height="20px" alt="">
-                            </el-table-column>
-                            <!-- 点击下载 -->
-                            <el-table-column
-                            width="40">
-                             <img src="../../../assets/images/下载.png" width="18px" height="18px" alt="">
-                            </el-table-column>
-                            <!-- 音乐标题 -->
-                            <el-table-column
-                            prop="name"
-                            label="音乐标题"
-                            show-overflow-tooltip
-                            width="240">
-                            </el-table-column>
-                            <!-- 歌手名称 -->
-                            <el-table-column
-                            prop="ar[0].name"
-                            show-overflow-tooltip
-                            label="歌手">
-                            </el-table-column>
-                            <!-- 专辑名 -->
-                            <el-table-column
-                            prop="al.name"
-                            show-overflow-tooltip
-                            width="150"
-                            label="专辑">
-                            </el-table-column>
-                            <!-- 时长 -->
-                            <el-table-column
-                            prop="time"
-                            width="70"
-                            label="时长">
-                            </el-table-column>
-                    </el-table>
+          <div class="listHead">
+            <div class="musicTitle">音乐标题</div>
+            <div class="art">歌手</div>
+            <div class="cd">专辑</div>
+            <div class="time">时长</div>
+          </div>
+          <div class="songList">
+            <div class="song" v-for="item,index in songs" :key="item.index" @dblclick="dbPlay(item)">
+              <div class="index">{{index+1}}</div>
+              <div class="icon">
+                 <img src="../../../assets/images/收藏 (1).png"  alt="">
+                 <img src="../../../assets/images/下载.png" alt="">
+              </div>
+              <div class="name">
+                <div class="nameTop">
+                  <div class="songName" >{{item.name}}</div>
+                  
+                  <div class="sq" v-if="item.sq">SQ</div>
+                  <div class="mv" v-if="item.mv">MV</div>
+                  <div class="vip" v-if="item.fee === 1">VIP</div>
+                </div>
+                <div class="alia">{{item.alia[0]}}</div>
+              </div>
+              <div class="arts" >
+                <div class="art" v-for="art in item.ar" :key="art.index">
+                  {{art.name}}
+                </div>
+                
+              </div>
+              <div class="cd">{{item.al.name}}</div>
+              <div class="time">{{item.time}}</div>
+             
+            </div>
+          </div>
         </el-tab-pane>
         <el-tab-pane label="歌手" name="2">
           <div class="artistList">
@@ -136,6 +122,8 @@
 
 <script>
 import search from '../../../http/api/search.js'
+import music from '../../../http/api/music'
+import {mapMutations} from 'vuex'
 export default {
     name:'search',
     data(){
@@ -156,6 +144,7 @@ export default {
       }
     },
     methods:{
+      ...mapMutations(['changeNowPlay','changePlayList','changeType']),
       // 获取数据
       async getSearch(keyword,limit,offset,type){
         const res = await search.keywordSearch(keyword,limit,offset,type)
@@ -195,24 +184,17 @@ export default {
           // 歌手
           this.type = 100
           this.limit = 20
-          // 已经请求过就别请求了
-          if(this.artists.length ===0){
-             this.getSearch(this.value,20,0,this.type)
-          }
+          this.getSearch(this.value,20,0,this.type)
         }else if(tab.index == 2){
           // 专辑
           this.type = 10
           this.limit = 20
-          if(this.albums.length === 0){
-            this.getSearch(this.value,20,0,this.type)
-          }
+          this.getSearch(this.value,20,0,this.type)
         }else if(tab.index == 3){
           // 视频
           this.limit = 21
           this.type = 1014
-          if(this.videos.length === 0){
-             this.getSearch(this.value,21,0,this.type)
-          }
+          this.getSearch(this.value,21,0,this.type)
         }else if(tab.index == 4){
           // 歌单
           this.type = 1000
@@ -262,14 +244,51 @@ export default {
       // 视频详情
       toVideoDetail(id){
       this.$router.push({ path: '/videoDetail', query: { id: id } })
-    }
+      },
+      async dbPlay(row){
+        this.changeType(0)
+        if(row.fee === 1){
+          // vip歌曲
+          // 需要判断vuex中缓存的vip信息（未实现，不想做）
+          console.log('需要vip');
+        }else if(row.fee === 8 || row.fee === 0){
+          // 8:非会员免费播放低音质 0:免费或无版权
+          const res = await music.getMusicUrl(row.id)
+          const newMusic = {
+                id:row.id, // 歌曲id
+                name:row.name, // 歌名
+                artName:row.ar[0].name, // 作者
+                duration:row.dt, // 时长
+                time:row.time,
+                img:row.al.picUrl, // 图片
+                url:res.data[0].url, // 歌曲url
+                mvid:row.mv === 0 ? null : row.mv, // mvid
+                sq: row.sq ? true :false,// sq
+                isNowPlay:true, // 是否立即播放
+                runTime:0, // 播放进度
+                switchTime:"00:00", // 转换后的时间
+                for:"搜索页"
+            }
+        this.changePlayList(newMusic)
+        this.changeNowPlay(newMusic)
+      }else if(row.fee === 4){
+        // 需要购买专辑
+        console.log('需要购买专辑！！');
+      }
+        }
+        
     },
     created(){
+      this.value = this.$route.query.value
     },
     watch:{
       $route(){
         if(this.$route.query.value){
+          // 默认进入单曲
+          this.type = 1
+          // 进入页面上总是显示第一个
           this.activeName = '1'  
+          // 获取关键字
           this.value = this.$route.query.value
         }
       },
@@ -325,6 +344,117 @@ export default {
     ::v-deep .el-tabs__header {
       margin:0;
       padding: 0 30px;
+    }
+    .listHead{
+      display:flex;
+      font-size:12px;
+      color:#5a5a5a;
+      padding: 10px 0;
+      .musicTitle{
+        padding-left: 135px;
+        padding-right: 233px;
+      }
+      .art{
+        padding-right: 75px;
+      }
+      .cd{
+        padding-right: 165px;
+      }
+    }
+    .songList{
+      font-size: 12px;
+      .song{
+        display: flex;
+        padding: 10px 0;
+        margin: 0 30px;
+        .index{
+          padding-left: 30px;
+          padding-right: 10px;
+          color: #8a8a8a;
+          padding-top: 2px;
+        }
+        .icon{
+          padding-top: 2px;
+          padding-right: 10px;
+          img{
+            width:15px;
+            padding:0 5px
+          }
+        }
+        .name{
+          width: 280px;
+          .nameTop{
+            width: 280px;
+            display: flex;
+            align-items: center;
+            .songName{
+                max-width: 200px;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+            .sq{
+              border: 1px solid #f75b27;
+              
+              border-radius: 3px;
+              padding: 0 1px;
+              color: #f75b27;
+              transform: scale(0.7);
+            }
+            .mv{
+              border: 2px solid #f01a16;
+              border-radius: 5px;
+              padding: 0 2px;
+              color: #f01a16;
+              transform: scale(0.7);
+            }
+            .vip{
+              border: 2px solid #f01a16;
+              border-radius: 5px;
+              padding: 0 2px;
+              transform: scale(0.7);
+              color:#fff;
+              background-color: rgb(0, 0, 0);
+            }
+          }
+          .alia{
+            width: 280px;
+            padding-top: 10px;
+            color: #8a8a8a;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+          }
+        }
+        .arts{
+          width: 100px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          display: flex;
+          .art{
+            max-width: 40px;
+            padding-right: 5px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+          }
+        }
+        .cd{
+          width: 160px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          color: #5a5a5a;
+        }
+        .time{
+          color:#a5a5a5;
+          padding-left:30px
+        }
+      }
+      .song:nth-child(2n+1){
+        background-color: #f1f1f1b5;
+      }
     }
     .artistList{
       .artist{

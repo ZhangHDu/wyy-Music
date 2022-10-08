@@ -89,55 +89,39 @@
           <!-- 列表 -->
             <el-tabs v-model="activeName" @tab-click="handleClick">
                 <el-tab-pane label="歌曲列表" name="first">
-                    <el-table
-                        :data="details.songs"
-                        lazy
-                        stripe
-                        @row-dblclick="dbPlay"
-                        style="width: 100%">
-                            <!-- 序号 -->
-                            <el-table-column
-                            type='index'
-                            align="center"
-                            width="50"> 
-                            </el-table-column>
-                            <!-- 添加我喜欢 -->
-                            <el-table-column
-                            width="40">
-                            <img src="../../assets/images/收藏 (1).png" width="20px" height="20px" alt="">
-                            </el-table-column>
-                            <!-- 点击下载 -->
-                            <el-table-column
-                            width="40">
-                             <img src="../../assets/images/下载.png" width="18px" height="18px" alt="">
-                            </el-table-column>
-                            <!-- 音乐标题 -->
-                            <el-table-column
-                            prop="name"
-                            label="音乐标题"
-                            show-overflow-tooltip
-                            width="240">
-                            </el-table-column>
-                            <!-- 歌手名称 -->
-                            <el-table-column
-                            prop="ar[0].name"
-                            show-overflow-tooltip
-                            label="歌手">
-                            </el-table-column>
-                            <!-- 专辑名 -->
-                            <el-table-column
-                            prop="al.name"
-                            show-overflow-tooltip
-                            width="150"
-                            label="专辑">
-                            </el-table-column>
-                            <!-- 时长 -->
-                            <el-table-column
-                            prop="time"
-                            width="70"
-                            label="时长">
-                            </el-table-column>
-                    </el-table>
+                    <div class="listHead">
+                        <div class="musicTitle">音乐标题</div>
+                        <div class="art">歌手</div>
+                        <div class="cd">专辑</div>
+                        <div class="time">时长</div>
+                    </div>
+                    <div class="songList">
+                        <div class="song" v-for="item,index in details.songs" :key="item.index" @dblclick="dbPlay(item)">
+                        <div class="index">{{index+1}}</div>
+                        <div class="icon">
+                            <img src="../../assets/images/收藏 (1).png"  alt="">
+                            <img src="../../assets/images/下载.png" alt="">
+                        </div>
+                        <div class="name">
+                            <div class="nameTop">
+                                <div class="songName">
+                                     {{item.name}}
+                                </div>
+                                <div class="sq" v-if="item.sq">SQ</div>
+                                <div class="mv" v-if="item.mv">MV</div>
+                                <div class="vip" v-if="item.fee === 1">VIP</div>
+                            </div>
+                        <div class="alia">{{item.alia[0]}}</div>
+                        </div>
+                        <div class="arts" >
+                            <div class="art" v-for="art in item.ar" :key="art.index">
+                            {{art.name}}
+                            </div>  
+                        </div>
+                        <div class="cd">{{item.al.name}}</div>
+                        <div class="time">{{item.time}}</div>
+                    </div>
+                     </div>
                 </el-tab-pane>
                 <!-- 评论 -->
                 <el-tab-pane :label="'评论('+details.commentCount+')'" name="second">
@@ -412,8 +396,9 @@ export default {
             })
             
         },
+        // 双击添加所有歌曲到播放列表
         async dbPlay(row){
-            console.log(row);
+            // console.log(row);
             // this.changeNowPlay(row.al)
             this.musicDetails = []
                 // 获取所有歌曲详情，并整理好数据
@@ -685,7 +670,7 @@ export default {
         }
     }
     .list{
-        margin-left:20px;
+       
         margin-bottom: 74px;
         // 修改tabs组件样式
         ::v-deep .el-tabs__item{
@@ -700,6 +685,10 @@ export default {
         ::v-deep .el-tabs__active-bar {
             background-color: rgb(208, 13, 13);
         }
+        ::v-deep .el-tabs__header {
+            margin: 0;
+            padding: 0 30px;
+        }
         // 修改输入框的样式
         .el-textarea /deep/ .el-textarea__inner{
              font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
@@ -708,14 +697,127 @@ export default {
             border-color: rgb(175, 175, 175);
  }
         .comments{
+            margin: 0 30px;
             .title{
                 font-size: 14px;
                 padding-bottom: 15px;
             }
             
         }
+         .listHead{
+      display:flex;
+      font-size:12px;
+      color:#5a5a5a;
+      padding: 10px 0;
+      .musicTitle{
+        padding-left: 135px;
+        padding-right: 233px;
+      }
+      .art{
+        padding-right: 75px;
+      }
+      .cd{
+        padding-right: 165px;
+      }
+    }
+        .songList{
+      font-size: 12px;
+      .song{
+        display: flex;
+        padding: 10px 0;
+        margin: 0 30px;
+        .index{
+          padding-left: 30px;
+          padding-right: 10px;
+          color: #8a8a8a;
+          padding-top: 2px;
+        }
+        .icon{
+          padding-top: 2px;
+          padding-right: 10px;
+          img{
+            width:15px;
+            padding:0 5px
+          }
+        }
+        .name{
+          width: 280px;
+          .nameTop{
+            width: 280px;
+            display: flex;
+            align-items: center;
+            .songName{
+                max-width: 200px;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+            .sq{
+              border: 1px solid #f75b27;
+              
+              border-radius: 3px;
+              padding: 0 1px;
+              color: #f75b27;
+              transform: scale(0.7);
+            }
+            .mv{
+              border: 2px solid #f01a16;
+              border-radius: 5px;
+              padding: 0 2px;
+              color: #f01a16;
+              transform: scale(0.7);
+            }
+            .vip{
+              border: 2px solid #f01a16;
+              border-radius: 5px;
+              padding: 0 2px;
+              transform: scale(0.7);
+              color:#fff;
+              background-color: rgb(0, 0, 0);
+            }
+          }
+          .alia{
+            width: 280px;
+            padding-top: 10px;
+            color: #8a8a8a;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+          }
+        }
+        .arts{
+          width: 100px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          display: flex;
+          .art{
+            max-width: 40px;
+            padding-right: 5px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+          }
+        }
+        .cd{
+          width: 160px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          color: #5a5a5a;
+        }
+        .time{
+          color:#a5a5a5;
+          padding-left:30px
+        }
+      }
+      .song:nth-child(2n+1){
+        background-color: #f1f1f1b5;
+      }
+    }
         .inputArea{
             padding-top: 5px;
+            margin: 0 30px;
             .inputIcon{
                 display: flex;
                 justify-content: space-between;
@@ -755,6 +857,7 @@ export default {
         .subList{
             display: grid;
             grid-template-columns: 1fr 1fr;
+            margin: 0 30px;
             .subs{
                 display: flex;
                 padding: 5px 0;

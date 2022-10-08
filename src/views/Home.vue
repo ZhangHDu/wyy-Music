@@ -314,6 +314,7 @@ export default {
   },
   created(){
     this.username = this.name
+    // 第一次加载如果本地存储有cookie，就直接获取用户信息
     if(this.cookie){
       // 获取账号信息
       this.getAccount()
@@ -338,6 +339,19 @@ export default {
   watch:{
     $route(){
       this.routeChange()
+    },
+    // 保证登录后能获取到用户信息以及歌单
+    cookie(){
+       if(this.cookie){
+      // 获取账号信息
+      this.getAccount()
+      // 获取用户信息 , 歌单，收藏，mv, dj 数量
+      this.getUserNums()
+      // 获取等级
+      this.getLevel()
+      // 将整理好的用户信息通过vuex管理
+      this.getUserDetails(this.user)
+    }
     }
   },
   updated(){
@@ -350,7 +364,7 @@ export default {
   // width: 100%;
   border-radius: 10px;
   position: relative;
-  margin: 10px auto;
+  margin: 40px auto;
   width: 1000px;
   overflow: hidden;
   background-color: #fff;

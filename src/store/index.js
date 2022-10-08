@@ -90,7 +90,10 @@ const store = new vuex.Store({
           return state.next = !state.next
         },
         addHistory(state,a){
-          return state.history.push(a)
+          if(!state.history.includes(a)){
+            return state.history.push(a)
+          }
+          
         },
         clearHistory(state){
           return state.history = []

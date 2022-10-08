@@ -110,8 +110,8 @@
               </div>
             </div>
             <!-- 歌词 -->
-            <div class="lyrics" ref="lrc" v-if="lrcArr.length !=0">
-              <div v-for="item in lrcArr" :key="item.index" :class="item.active" >{{item.content}}</div>
+            <div class="lyrics" ref="lyric"  v-if="lrcArr.length !=0">
+              <div v-for="item in lrcArr" :key="item.index" :ref="item.active" :class="item.active" >{{item.content}}</div>
             </div>
             <div class="lyrics2" v-else>
               还没有歌词哦～
@@ -270,6 +270,7 @@ export default {
             isShowList:false, // 是否显示播放列表
             timer:null, // 是否清除定时器
             long:"width:0%", // 进度条百分比
+            deg:0,
             showDetail:false, // 显示歌曲详情
             detailStyle:null, 
             armStyle:'transform: rotate(318deg);', // 唱针样式
@@ -281,7 +282,7 @@ export default {
             total:0, // 评论数
             lyric:null, // 原生歌词
             lrcArr:[], // 处理完成的原生歌词
-           
+            top:null,// 歌词滚动参数，
         }
     },
     components:{
@@ -461,8 +462,10 @@ export default {
           // 获取上一句歌词的时间
           this.lrcArr.forEach((item,i)=>{
             if(i == 0){
+              // 第一句歌词的上一句时间为0
               item.pre = 0
             }else if(i== this.lrcArr.length-1){
+              // 最后一句歌词的下一句时间为0
               item.next = 0
             }else{
               item.pre = this.lrcArr[i - 1].dur
@@ -474,14 +477,24 @@ export default {
         changeTime(){
           // 给当前歌词添加样式
           this.lrcArr.forEach((item) => {
-             if(this.playData.runTime+50 >= item.dur && this.playData.runTime+50 <=item.next){
+             if(this.playData.runTime >= item.dur && this.playData.runTime <=item.next){
               item.active = "active"
               
              }else{
               item.active = ""
              }
+             
           });
-          
+          try {
+             if(this.$refs.active && this.$refs.active[0].offsetTop){
+                this.top = this.$refs.active[0].offsetTop
+          }
+          } catch (error) {
+            return
+          }
+         
+        
+         
         },
         // 播放相似歌曲
         async playThis(item){
@@ -623,9 +636,15 @@ export default {
       },
       // 控制唱片旋转
       long(){
-        this.blackStyle = "transform: rotate("+(this.$refs.audio.currentTime/this.$refs.audio.duration)*1500+"deg);"
+        this.deg +=0.05
+        this.blackStyle = "transform: rotate("+this.deg+"deg);"
         // console.log(this.$refs.audio.currentTime);
       },
+      top(){
+        // 歌词滚动
+        this.$refs.lyric.scrollTop = this.top - 300
+        
+      }
     }
 }
 </script>
@@ -901,14 +920,16 @@ export default {
             margin-right: 120px;
             height: 340px;
             overflow-y: scroll;
+             scroll-behavior: smooth;
             div{
               font-size: 14px;
               margin: 10px 0;
               color: #626262;
+              transition: color 0.5s linear;
             }
             .active{
               font-size: 16px;
-              color: #000;
+              color:#000;
               
             }
           }
@@ -1019,8 +1040,12 @@ export default {
               }
               .smrB{
                 font-size: 12px;
+                width: 150px;
                 color: #717171;
                 display: flex;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
               }
             }
           }
