@@ -157,7 +157,7 @@
     <!-- 个人信息 -->
     <userCard v-if="isShowUser" v-model="isShowUser"/>
     <!-- 底部播放器组件 -->
-    <player v-show='showPlayer'/>
+    <player v-show='showPlayer' :showPlayer="showPlayer"/>
 
   </div>
 </template>

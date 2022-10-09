@@ -182,8 +182,8 @@ export default {
     box-shadow: 5px 5px 15px rgb(167, 167, 167) ;
     border-radius: 15px;
     position: fixed;
-    top: 50px;
-    left: 130px;
+    top: 80px;
+    left: 430px;
     z-index: 9999;
     .top{
         display: flex;

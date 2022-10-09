@@ -226,8 +226,9 @@ export default {
       const a = this.songMsg.indexOf(this.nowPlay)
       if(a === this.songMsg.length-1){
         console.log('重新请求');
+        this.getFM()
       }else{
-        this.preUrl = this.nowPlay.album.blurPicUrl
+        this.preUrl = this.nowPlay.album.picUrl
         this.nowPlay = this.songMsg[a+1]
         this.id = this.nowPlay.id
         this.img = this.nowPlay.album.picUrl
@@ -246,7 +247,7 @@ export default {
       
     },
     delThis(){
-
+      console.log('删除当前，播放下一首');
     }
   },
   created(){

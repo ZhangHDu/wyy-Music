@@ -262,6 +262,7 @@ import {mapState,mapMutations} from 'vuex'
 import comments from './comments'
 import music from '../http/api/music'
 export default {
+    props:['showPlayer'],
     data(){
         return{
             is_play:false, // 是否播放
@@ -644,6 +645,13 @@ export default {
         // 歌词滚动
         this.$refs.lyric.scrollTop = this.top - 300
         
+      },
+      // 进入视频详情暂停音乐播放
+      showPlayer(){
+        if(!this.showPlayer){
+          this.is_play = false
+
+        }
       }
     }
 }

@@ -125,8 +125,8 @@ export default {
     // height: 1350px;
     background-color: #fff;
     position: fixed;
-    top: 55px;
-    left: 205px;
+    top: 90px;
+    left: 415px;
     z-index: 9999;
     box-shadow: 4px 4px 15px rgba(77, 77, 77, 0.515);
     border-radius: 5px;

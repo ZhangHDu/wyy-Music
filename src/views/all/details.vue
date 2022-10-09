@@ -238,7 +238,7 @@ export default {
         isRepeat
     },
     methods:{
-         ...mapMutations(['clearPlayList','replacePlayList','changeNowPlay','addPlayList','changePlayList']),
+         ...mapMutations(['clearPlayList','replacePlayList','changeNowPlay','addPlayList','changePlayList','changeType']),
         // 获取歌单详情
         async getDetails(id){
             if(!this.isFirst){
@@ -351,6 +351,7 @@ export default {
         // 播放全部，替换播放列表，立即播放
         allPlay(){
                 console.log('替换当前播放列表');
+                this.changeType(0)
                 this.musicDetails = []
                 // 获取所有歌曲详情，并整理好数据
                 this.musicDetail()
@@ -400,6 +401,7 @@ export default {
         async dbPlay(row){
             // console.log(row);
             // this.changeNowPlay(row.al)
+            this.changeType(0)
             this.musicDetails = []
                 // 获取所有歌曲详情，并整理好数据
             this.musicDetail()

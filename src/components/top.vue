@@ -42,7 +42,8 @@
           <div class="base">
             <!-- 搜索 -->
             <div class="search">
-              <img src="../assets/images/top/搜索.png" alt="" :style="changeStyle">
+              <img src="../assets/images/top/搜索.png" alt="" :style="changeStyle" v-show="!topStyle">
+              <img src="../assets/images/top/搜索2.png" alt="" :style="changeStyle" v-show="topStyle">
               <input v-model="value" type="text" :style="changeStyle" @input="suggestSearch" @keyup.13="search"  @focus="showList" @blur="unshowList">
             </div>
             <!-- 设置 -->
@@ -297,6 +298,8 @@ export default {
       },
        value(){
         if(this.value ==="" || this.value === '搜索'){
+          this.isSearch = false
+        }else if(!this.value){
           this.isSearch = false
         }
       },

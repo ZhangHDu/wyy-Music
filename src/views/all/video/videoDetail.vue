@@ -126,7 +126,7 @@ export default {
         this.$router.push({ path: '/videoDetail', query: { id: id} })
       },
       back(){
-        this.$router.push({path:'/video'})
+        this.$router.go(-1)
       }
     },
     components:{

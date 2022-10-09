@@ -8,7 +8,6 @@ const store = new vuex.Store({
             avatarUrl:"",//头像
             cookie:"",
             playList:[], //播放歌单
-            fmPlayList:[], //fm播放歌单
             nowplay:{}, //当前播放
             topStyle:false, //顶部样式控制
             user:{}, // 用户信息

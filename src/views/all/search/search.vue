@@ -86,12 +86,13 @@
               <img :src="item.coverUrl" alt="">
               <div class="nums">
                 <img src="../../../assets/images/播放4.png" alt="">
-                {{item.playTime}}
+                {{item.nums}}
               </div>
               <div class="time">{{item.time}}</div>
             </div>
             <div class="msg">
               <div class="videotitle">
+                <div class="icon" v-if="item.type === 0">MV</div>
                 {{item.title}}
               </div>
               <div class="by">
@@ -300,7 +301,24 @@ export default {
           this.getSearch(this.value,100,0,1)
         }
       },
-     
+       videos(){
+      // 处理播放数量和时间戳
+      this.videos.forEach(item=>{
+        item.time = this.getTime(item.durationms,2)
+        if(item.playTime > 9999){
+          item.nums =  Math.floor(item.playTime/10000) +'万'
+        }else{
+          item.nums = item.playTime
+        } 
+      })
+      // 数量不够一页获取多一页的数据
+      if(this.videos.length<9 && this.type !==0){
+        this.getCateVideo(this.type)
+      }else if(this.videos.length<9 && this.type ===0){
+        this.page +=1
+        this.getAllVideo(this.page)
+      }
+    },
     }
 }
 </script>
@@ -547,6 +565,7 @@ export default {
             position: absolute;
             right:20px;
             color: #fff;
+            font-size: 12px;
           }
           .nums{
             top: 5px;
@@ -559,7 +578,9 @@ export default {
             }
           }
           .time{
-            bottom: 5px;
+            bottom: 7px;
+            right: 15px;
+            font-weight: bolder;
           }
         }
         .msg{
@@ -570,7 +591,15 @@ export default {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-           
+            
+            .icon{
+              display: inline-block;
+              border: 1px solid #f01a16;
+              border-radius: 5px;
+              padding: 0 2px;
+              color: #f01a16;
+              transform: scale(0.7);
+            }
           }
           .by{
             color: #d1d1d1;
