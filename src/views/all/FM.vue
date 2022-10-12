@@ -52,8 +52,8 @@
             </div>
           </div>
           <!-- 歌词 -->
-          <div class="lyrics" v-if="lrcArr.length !=0">
-              <div v-for="item in lrcArr" :key="item.index" :class="item.active" >{{item.content}}</div>
+          <div class="lyrics" v-if="lrcArr.length !=0" ref='lyric'>
+              <div v-for="item in lrcArr" :key="item.index" :ref="item.active" :class="item.active" >{{item.content}}</div>
           </div>
           <div class="lyrics2" v-else>
               还没有歌词哦～
@@ -111,6 +111,7 @@ export default {
       hotComments:[], // 精彩评论
       comments:[], // 评论
       total:0, // 评论数量
+      top:null,// 歌词滚动参数，
     }
   },
   components:{
@@ -267,7 +268,32 @@ export default {
             this.getFM()
         }
       },
-    
+     'nowplay.runTime':{
+        handler(){
+         this.lrcArr.forEach((item) => {
+             if(this.nowplay.runTime >= item.dur && this.nowplay.runTime <=item.next){
+              item.active = "active"
+              
+             }else{
+              item.active = ""
+             }
+             
+          });
+          try {
+             if(this.$refs.active && this.$refs.active[0].offsetTop){
+                this.top = this.$refs.active[0].offsetTop
+          }
+          } catch (error) {
+            return
+          }
+        },
+        deep: true
+      },
+      top(){
+        // 歌词滚动
+        this.$refs.lyric.scrollTop = this.top - 280
+        
+      },
   },
   computed:{
     ...mapState(['nowplay','next','type'])
@@ -409,6 +435,8 @@ export default {
             margin-right: 120px;
             height: 340px;
             overflow-y: scroll;
+            // 滚动过渡效果
+            scroll-behavior: smooth;
             div{
               font-size: 14px;
               margin: 10px 0;

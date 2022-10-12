@@ -610,7 +610,6 @@ export default {
             this.nextPlay()
           }
           this.playData.switchTime = this.getTime(this.playData.runTime,2)
-          
          
         },
         deep: true
@@ -928,7 +927,8 @@ export default {
             margin-right: 120px;
             height: 340px;
             overflow-y: scroll;
-             scroll-behavior: smooth;
+            // 滚动过渡效果
+            scroll-behavior: smooth;
             div{
               font-size: 14px;
               margin: 10px 0;
