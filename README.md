@@ -2,7 +2,7 @@
 
 ## 安装依赖
 ```
-npm install
+cnpm install
 ```
 
 ### 项目启动
